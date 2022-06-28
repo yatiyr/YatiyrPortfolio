@@ -1,2 +1,6 @@
 # YatiyrPortfolio
-Yatiyr is back in the house with a new portfolio project :D. This time I might do some fancy stuff with WebGL!
+
+My GitHub page has turned into a Dumpster of Portfolio projects. Lets add a new one.
+Because, why not :D
+
+This time I might do some fancy stuff with WebGL!
