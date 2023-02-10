@@ -1,0 +1,8 @@
+.truncated {
+    -webkit-box-orient: vertical !important;
+    display: block !important;
+    display: -webkit-box !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    -webkit-line-clamp: 10 !important;
+}
