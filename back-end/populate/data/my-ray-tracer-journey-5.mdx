@@ -1,0 +1,328 @@
+---
+title: 'My Ray Tracer Journey - Part 4'
+publishedAt: '2021-06-03'
+summary: 'In this part, we have learnt how to integrate textures to our ray tracers.'
+headImageUrl: '/images/killeroo_bump_walls-6.png'
+highlighted: 'true'
+---
+
+## Table Of Contents
+
+1. [Determining What To Add](/blog/my-ray-tracer-journey-5#determining-what-to-add)
+2. [Images Node](/blog/my-ray-tracer-journey-5#images-node)
+3. [Results](/blog/my-ray-tracer-journey-5#results)
+4. [Problems I've Encountered](/blog/my-ray-tracer-journey-5#problems-i've-encountered)
+5. [Conclusion](/blog/my-ray-tracer-journey-5#conclusion)
+
+## Overview
+
+It is 11:50 PM and I’ve managed to submit my code before the deadline this time.
+This week was about textures. We have implemented;
+
+- Background Textures for rays not hitting any objects
+- Diffuse reflectance maps for manipulating reflectance coefficient (replacing or blending)
+- Completely using texture color on an object (replace_all)
+- Normal Maps
+- Bump Maps
+- Procedural Textures (Perlin Noise)
+
+It was really hard for me to completely understand and implement these but at the end,
+I have managed to produce similar results. I have done a lot of debugging this week.
+
+<br/>
+
+For now, I could not produce “veach_ajar” but when I have time, I am going to implement
+it and share my results. I have also added support for some other texture maps that I’ve
+learned while studying OpenGL (specular, emmission etc.). I want to import some scenes
+implemented by 3D artists to my raytracer. I’m very excited for that. But first, I need
+to implement “veach_ajar” scene.
+
+## Determining What To Add
+
+Before I started implementing the homework, I first tried to understand .xml files and
+determine what to add. I have checked every xml file associated with homework 4 and
+made a list of the things that I don’t currently have. These were;
+
+- Textures Node
+    - Images Node
+        -Image Name
+    - Texture Map Node
+        - Image Id
+        - Decal Mode
+        - Normalizer (divide 8bit rgb value with normalizer)
+        - Interpolation (bilinear or nearest neighbor)
+        - BumpFactor (how much we alter surface normals)
+        - Noise Scale (adjust perlin noise size)
+        - Noise Conversion (patchy or veiny perlin noise)
+- TexCoordData
+- Mesh Node ( shadingMode=”flat” or “smooth” selection added for soft shading)
+    - Textures
+    - Faces (vertexOffset and textureOffset support added)
+
+I want to explain some elements of the list above.
+
+## Images Node
+
+So, I’ve added an Image class to my project. It basically stores the pixels and has a function to get pixel
+values. It utilizes stbi_image header for reading images.
+
+<br/>
+
+```cpp:Object class
+class Image {
+public:
+    int height, width, channels;
+    unsigned char* pixels;
+    Image(const char* filepath)
+    {
+        pixels = stbi_load(filepath, &width, &height, &channels, 0);
+    }
+
+    ~Image()
+    {
+        delete pixels;
+    }
+
+    glm::vec3 get(int i, int j)
+    {
+
+        int indexX = std::clamp(j, 0, height - 1) * width * channels;
+        int indexY = std::clamp(i ,0, width - 1) * channels;
+
+        float r = pixels[indexX + indexY];
+        float g = pixels[indexX + indexY + 1];
+        float b = pixels[indexX + indexY + 2];
+
+        return glm::vec3(r,g,b);        
+    }
+
+};
+```
+<br/>
+
+For every Image Node in the xml file, I create an Image pointer and push
+it into a std::vector.
+
+## Texutre Map Node
+
+I’ve also added another class for Texture Maps. Our objects may use them
+for different purposes. In this homework, we have used texture maps for
+replacing diffuse kd and changing the normals.
+
+<br/>
+
+As far as I know, we can also use texture maps for things like;
+
+- Light emitting surfaces
+- Rough surfaces
+- Different specular kd
+
+So, I will implement them as well but currently, my ray tracer only supports
+specular, diffuse,normal and bump maps.
+
+<br/>
+
+My texture class also supports procedural textures. For that, I’ve separately
+implemented a Perlin Noise Generator class for getting noise values. I’ve
+used the technique that we’ve learnt in class. My implementation of perlin
+noise can be seen here;
+
+<br/>
+
+[Perlin Noise Implementation](https://github.com/yatiyr/AdvancedRayTracerCPU/blob/main/include/PerlinNoiseGenerator.h)
+
+<br/>
+
+So, how I use this class? Every object that is rendered can hold pointers to six textures;
+
+- Diffuse Map
+- Specular Map
+- Emission Map
+- Normal Map
+- Bump Map
+- Roughness Map
+
+<br/>
+
+These are the ones that I’ve thought. So behavior of object intersection reports are
+determined by looking at the existence of these texture maps. All these maps can be
+image textures or procedural textures. This is determined while parsing xml files.
+
+## Results
+
+I want to start sharing my results here, because all the results are about texture maps.
+
+<br/>
+
+My perlin noise generator gives this procedural texture. It was really cool learning about perlin textures because
+I know that it is used a lot in graphics programming world.
+
+<br/>
+<ApiImage alt="sphere_perlin" src="/images/sphere_perlin.png" heigth="100%" width="100%" caption="sphere_perlin.png 137.869 ms"/>
+<br/>
+
+When I use scaling for perlin textures, I get the result below;
+
+<br/>
+<ApiImage alt="sphere_perlin_scale" src="/images/sphere_perlin_scale.png" heigth="100%" width="100%" caption="sphere_perlin_scale.png 135.409ms"/>
+<br/>
+
+We can also use perlin textures as bump maps. By doing that we can create interesting surfaces.
+
+<br/>
+<ApiImage alt="sphere_perlin_bump" src="/images/sphere_perlin_bump.png" heigth="100%" width="100%" caption="sphere_perlin_bump.png 330.824ms"/>
+<br/>
+
+Below, we can see an example of a normal map applied on the right sphere.
+
+<br/>
+<ApiImage alt="sphere_normal" src="/images/sphere_normal.png" heigth="100%" width="100%" caption="sphere_normal.png 5170.43 ms"/>
+<br/>
+
+A world map is used as a diffuse texture on the left sphere and as a bump map on the right one.
+
+<br/>
+<ApiImage alt="sphere_nobump_justbump" src="/images/sphere_nobump_justbump.png" heigth="100%" width="100%" caption="sphere_nobump_justbump.png 60.85ms"/>
+<br/>
+
+We can use bump map and diffuse textures at the same time too. I have noticed that my bump map results are
+a little bit different than the provided outputs. I think that it is because of my method of taking forward
+differences on bump maps. I take average value of r,g and b’s for every pixel and calculate their difference
+for finding d_u’s in bump mapping formula. Maybe I should find another technique.
+
+<br/>
+<ApiImage alt="sphere_nobump_bump" src="/images/sphere_nobump_bump.png" heigth="100%" width="100%" caption="sphere_nobump_bump.png 60.85ms"/>
+<br/>
+
+Below, we can see the difference between nearest neighbor and bilinear interpolation for texture mapping.
+Bilinear interpolation gives more satisfying results.
+
+<br/>
+<ApiImage alt="sphere_nearest_bilinear" src="/images/sphere_nearest_bilinear.png" heigth="100%" width="100%" caption="sphere_nearest_bilinear.png 58.554ms"/>
+<br/>
+
+The model below uses soft shading and bump maps together.
+
+<br/>
+<ApiImage alt="killeroo_bump_walls-5" src="/images/killeroo_bump_walls-5.png" heigth="100%" width="100%" caption="killeroo_bump_walls.png 2069ms"/>
+<br/>
+
+Textures can also be used as background images. The next two images below shows that.
+
+<br/>
+<ApiImage alt="galactica_static-5" src="/images/galactica_static.png" heigth="100%" width="100%" caption="galactica_static.png 203.539ms"/>
+<br/>
+
+We add motion blur to the spaceship;
+
+<br/>
+<ApiImage alt="galactica_dynamic" src="/images/galactica_dynamic.png" heigth="100%" width="100%" caption="galactica_dynamic 34 seconds"/>
+<br/>
+
+Below, looking at both of the images, we can see an example of the visual enhancement normal maps provide;
+
+<br/>
+<ApiImage alt="cube_wall" src="/images/cube_wall.png" heigth="100%" width="100%" caption="cube_wall.png 90ms"/>
+<br/>
+
+<br/>
+<ApiImage alt="cube_wall_normal" src="/images/cube_wall_normal.png" heigth="100%" width="100%" caption="cube_wall_normal.png 90ms"/>
+<br/>
+
+The images above are both rendered in approx. 90ms. So using texture maps does not add significant amount of computational intensity to
+our ray tracer, yet it increases visual quality a lot.
+
+<br/>
+
+In the next image, we can see a collection of different texture modes applied on transformed spheres;
+
+<br/>
+<ApiImage alt="ellipsoids_texture" src="/images/ellipsoids_texture.png" heigth="100%" width="100%" caption="ellipsoids_texture.png 94.466ms"/>
+<br/>
+
+Another example of bump mapping is shown in the next image. It’s color is a little bit different and I think that it is because
+the way that I use normalizer node in xml files.
+
+<br/>
+<ApiImage alt="bump_mapping_transformed" src="/images/bump_mapping_transformed.png" heigth="100%" width="100%" caption="bump_mapping_transformed.png 93.332ms"/>
+<br/>
+
+For the image below, I have no idea why it produces a noisy perlin noise (:D) for the right cube. I could not find the reason here for now.
+
+<br/>
+<ApiImage alt="cube_perlin" src="/images/cube_perlin.png" heigth="100%" width="100%" caption="cube_perlin.png 165.495ms"/>
+<br/>
+
+Perlin noise is applied to cubes as bump maps;
+
+<br/>
+<ApiImage alt="cube_perlin_bump" src="/images/cube_perlin_bump.png" heigth="100%" width="100%" caption="cube_perlin_bump.png 314.12ms"/>
+<br/>
+
+Another normal map applied to a cube
+
+<br/>
+<ApiImage alt="cube_cushion" src="/images/cube_cushion.png" heigth="100%" width="100%" caption="cube_cushion.png 90.499ms"/>
+<br/>
+
+<br/>
+<ApiImage alt="cube_waves" src="/images/cube_waves.png" heigth="100%" width="100%" caption="cube_waves.png 89.243ms"/>
+<br/>
+
+## Problems I've Encountered
+
+First of all, In order to fully synchronize with the class, I had to change color values
+that I take from floating points between 0-1 to 8 bit unsigned integers. I was having a
+lot of difficulties while dealing with colors so changing it helped me a lot.
+
+<br/>
+
+I had a lot of problems in the implementation of bump maps because I was normalizing
+tangent and bitangent vectors unnecessarily. I was getting results like this;
+
+<br/>
+<ApiImage alt="killeroo_bump_walls_error" src="/images/killeroo_bump_walls_error.png" heigth="100%" width="100%" caption="killeroo error"/>
+<br/>
+
+But I’ve solved it. Secondly, I had very bright textures in galactica image because
+the lack of normalizer node in its xml files. I could just use default normalizer
+as 255 but I wanted to add a normalizer node to mesh itself in the xml file. This
+was the error I was getting;
+
+<br/>
+<ApiImage alt="galactica_static_error" src="/images/galactica_static_error.png" heigth="100%" width="100%" caption="galactica error"/>
+<br/>
+
+In the above image, It is seen that my background texture has also errors. It was a silly
+mistake in the code, I fixed it quickly.
+
+## Conclusion
+
+This homework was the hardest one for me. But I’ve learnt a lot and produced really
+satisfying results. I’ve also looked at the blog pages of other friends who took
+the course in previous semesters and saw their images after the texture homework.
+I’m really excited to produce these cool images in the upcoming weeks.
+
+<br/>
+
+I’ve played around with killeroo xml file a little bit and produced this image.
+It’s my wallpaper in my workplace. I’ve rendered it in my work computer. Today
+I was supposed to read and evaluate reports coming from contestants in “teknofest”
+rocket contest, so while I was reading these reports, I rendered some cool images :D.
+
+<br/>
+<ApiImage alt="killeroo_bump_walls-6" src="/images/killeroo_bump_walls-6.png" heigth="100%" width="100%" caption="my killeroo"/>
+<br/>
+
+I will shortly add ply support for texturing. That’s it from me for this week.
+
+<br/>
+
+And its time. I have implemented veach_ajar scene too, here is my result. I have implemented checkerboard
+procedural texture and texture support for ply files;
+
+<br/>
+<ApiImage alt="veachajar-1" src="/images/veachajar-1.png" heigth="100%" width="100%" caption="veachAjar.png 29.6058 s"/>
+<br/>
+
+[Part 5 is here](/blog/my-ray-tracer-journey-6)

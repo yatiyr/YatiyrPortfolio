@@ -1,0 +1,329 @@
+---
+title: 'My Ray Tracer Journey - Part 7'
+publishedAt: '2021-07-21'
+summary: 'The last homework of this beautiful course has come :D. We have implemented object lights, Monte Carlo Sampling and Path Tracing.'
+headImageUrl: '/images/glass_next_importance_russian_tonemapped-3.png'
+highlighted: 'true'
+---
+
+## Table Of Contents
+
+1. [Object Lights](/blog/my-ray-tracer-journey-8#object-lights)
+2. [Light Mesh](/blog/my-ray-tracer-journey-8#light-mesh)
+3. [Light Sphere](/blog/my-ray-tracer-journey-8#light-sphere)
+4. [Path Tracing](/blog/my-ray-tracer-journey-8#path-tracing)
+5. [Conclusion](/blog/my-ray-tracer-journey-8#conclusion)
+6. [Some High Quality Images](/blog/my-ray-tracer-journey-8#some-high-quality-images)
+
+## Overview
+
+End of the semester came finally :D. In the final part of our
+homeworks, we have implemented;
+
+- Object Lights ( Sphere and Mesh)
+- Monte Carlo Sampling
+- Path Tracing
+
+I struggled a lot as always and want to share what I did in this
+part. I got some weird results while implementing.
+
+<br/>
+
+This homework is divided into two parts. In the first part we
+test object lights without using path tracing and in the second
+part, we merge the first part with path tracing technique.
+
+## Object Lights
+
+We first had to implement object lights. They can be spheres or meshes.
+Best way to represent them in our project is using multiple inheritance;
+
+- LightSphere is a Sphere and a Light
+- LightMesh is a Mesh and a Light
+
+Object lights can intersect with rays and this determines things
+like stopping conditions for path tracing usually.
+
+<br/>
+
+In order to use object lights properly, we need to implement
+sampling techniques. With sampling, we randomly select a point
+on the object light and use that point for illumination. Object
+lights have radiance associated with them. This is not like intensity,
+we need to divide our result to the probability of sampling that point.
+We actually did that in area lights.
+
+<br/>
+
+So, by keeping them in mind, I first implemented LightSphere and
+LightMesh classes and added functions to these classes for sampling
+random points. Different techniques are used for LightMeshes and
+LightSpheres
+
+## Light Mesh
+
+Light Meshes have triangles and we first need to sample a triangle,
+and then we need to sample a point inside that triangle.
+
+<br/>
+
+We want to have higher probability for selecting triangles with bigger
+surface areas. I came up with this idea after thinking:
+
+<br/>
+
+I sorted all triangles of the mesh in an array with ascending order
+and generated a random float number (between 0.0 and 1.0) for indexing
+the array. I round and transform it into integer for indexing. But
+this random number has equal probability for all indices of the array.
+I thought that maybe if I take the square root of this random number
+(since it is less than 1.0) I will more likely to get higher indices
+and I tried it separately and saw that working.
+
+<br/>
+
+And then, just as we saw in class, I uniformly sampled a point inside
+the selected triangle. I generated two random variables (between 0.0 and 1.0)
+and again for ensuring uniformity, I needed to take square root of one of my
+random variables.
+
+<br/>
+
+After sampling, we need to divide the result to the probability of selecting
+that sample. It is normally;
+
+$$
+    \frac{dist^{2}}{A\cos(\theta)}
+$$
+
+here $dist$ is the distance and $A$ is the total area.
+
+<br/>
+
+Theta is the angle between our sampled direction
+and the surface normal of that triangle we have sampled.
+
+<br/>
+
+Lastly, this light object may have transformations, so
+we also need to apply the transformation matrices accordingly.
+
+## Light Sphere
+
+For getting a point on the sphere, we need to do inversion
+sampling. We first generate an orthonormal basis around the
+w direction (center_sphere – point) and then find theta and
+phi angles for generating a direction. We also need to know
+the theta_max which is;
+
+$$
+    \arcsin(\frac{radius}{dist})
+$$
+
+here $dist$ is the distance between center and point.
+
+<br/>
+
+Before doing any of these, we first need to transform
+our point into the local coordinates of the sphere. After
+we finish sampling, we need to transform it back to world
+coordinates.
+
+## Direct Lighting
+
+This is the first part of the homework. Here, I tried
+implementing object lights with direct lighting. I was
+constantly getting wrong results like these;
+
+<br/>
+<ApiImage alt="cornellbox_jaroslav_diffuse_area_tonemapped_wrongnormals" src="/images/cornellbox_jaroslav_diffuse_area_tonemapped_wrongnormals.png" heigth="100%" width="100%" caption="wrong normals 1"/>
+<br/>
+
+<br/>
+<ApiImage alt="cornellbox_jaroslav_glossy_area_small_tonemappedweird" src="/images/cornellbox_jaroslav_glossy_area_small_tonemappedweird.png" heigth="100%" width="100%" caption="wrong normals and points"/>
+<br/>
+
+I was getting these errors because of some mistakes in sampling.
+They were silly mistakes. I corrected them after I figured out the problems.
+
+<br/>
+
+Here are my results;
+
+<br/>
+<ApiImage alt="cornellbox_jaroslav_diffuse_area_tonemapped" src="/images/cornellbox_jaroslav_diffuse_area_tonemapped.png" heigth="100%" width="100%" caption="cornellbox_jaroslav_diffuse_area.png 7.724s"/>
+<br/>
+
+<br/>
+<ApiImage alt="cornellbox_jaroslav_diffuse_tonemapped" src="/images/cornellbox_jaroslav_diffuse_tonemapped.png" heigth="100%" width="100%" caption="cornellbox_jaroslav_diffuse.png 3.175s"/>
+<br/>
+
+<br/>
+<ApiImage alt="cornellbox_jaroslav_glossy_area_ellipsoid" src="/images/cornellbox_jaroslav_glossy_area_ellipsoid.png" heigth="100%" width="100%" caption="cornellbox_jaroslav_glossy_area_ellipsoid.png 12.5748s"/>
+<br/>
+
+I don’t know why I get the picture above.
+I tried a lot of things and still it is slightly different.
+
+<br/>
+<ApiImage alt="cornellbox_jaroslav_glossy_area_small" src="/images/cornellbox_jaroslav_glossy_area_small.png" heigth="100%" width="100%" caption="cornellbox_jaroslav_glossy_area_small.png 11.3462s"/>
+<br/>
+
+<br/>
+<ApiImage alt="cornellbox_jaroslav_glossy_area_sphere-2" src="/images/cornellbox_jaroslav_glossy_area_sphere-2.png" heigth="100%" width="100%" caption="cornellbox_jaroslav_area_sphere.png 11.2202s"/>
+<br/>
+
+<br/>
+<ApiImage alt="cornellbox_jaroslav_glossy_area_tonemapped" src="/images/cornellbox_jaroslav_glossy_area_tonemapped.png" heigth="100%" width="100%" caption="cornellbox_jaroslav_glossy_area.png 5.9284s"/>
+<br/>
+
+<br/>
+<ApiImage alt="cornellbox_jaroslav_glossy_tonemapped" src="/images/cornellbox_jaroslav_glossy_tonemapped.png" heigth="100%" width="100%" caption="cornellbox_jaroslav_glossy.png 4.03642s"/>
+<br/>
+
+This is the direct light part. After this, I leaned on implementing path tracing.
+
+## Path Tracing
+
+In this part, we needed to make some additions to our cameras for
+rendering parameters. We have three parameters for path tracing;
+
+- Importance Sampling ( or cosine sampling)
+- Next Event Estimation
+- Russian Roulette
+
+Normally without importance sampling we uniformly sample directions
+around the surface normal for calculating the next bounce of the ray.
+But with importance sampling, directions more similar to the surface
+normal are more likely to be used.
+
+<br/>
+
+With next event estimation, we also use illumination of light sources
+in each iteration. However, if our ray intersects with a light source,
+we discard that ray.
+
+<br/>
+
+And finally, russian roulette is for determining when to terminate a ray.
+For doing that, I used the 1 – throughput approach. After many bounces, a
+ray is more likely to be terminated. But ofcourse, there is no termination
+while bounce number is smaller than max_recursion_depth.
+
+<br/>
+
+And here are my results for pathTracing.
+
+<br/>
+
+Diffuse scenes:
+
+<br/>
+<ApiImage alt="diffuse_next_tonemapped" src="/images/diffuse_next_tonemapped.png" heigth="100%" width="100%" caption="diffuse_next.png 65.0967s"/>
+<br/>
+
+<br/>
+<ApiImage alt="diffuse_next_russian_tonemapped" src="/images/diffuse_next_russian_tonemapped.png" heigth="100%" width="100%" caption="diffuse_next_russian.png 69.833s"/>
+<br/>
+
+<br/>
+<ApiImage alt="diffuse_next_importance_tonemapped" src="/images/diffuse_next_importance_tonemapped.png" heigth="100%" width="100%" caption="diffuse_next_importance.png 68.7382s"/>
+<br/>
+
+<br/>
+<ApiImage alt="diffuse_next_importance_russian_tonemapped" src="/images/diffuse_next_importance_russian_tonemapped.png" heigth="100%" width="100%" caption="diffuse_next_importance_russian.png 68.9622s"/>
+<br/>
+
+<br/>
+<ApiImage alt="diffuse_tonemapped" src="/images/diffuse_tonemapped.png" heigth="100%" width="100%" caption="diffuse.png 21.6097s"/>
+<br/>
+
+<br/>
+<ApiImage alt="diffuse_russian_tonemapped" src="/images/diffuse_russian_tonemapped.png" heigth="100%" width="100%" caption="diffuse_russian.png 22.5537s"/>
+<br/>
+
+<br/>
+<ApiImage alt="diffuse_importance_tonemapped" src="/images/diffuse_importance_tonemapped.png" heigth="100%" width="100%" caption="diffuse_importance.png 21.6572s"/>
+<br/>
+
+<br/>
+<ApiImage alt="diffuse_importance_russian_tonemapped" src="/images/diffuse_importance_russian_tonemapped.png" heigth="100%" width="100%" caption="diffuse_importance_russian.png 22.3172s"/>
+<br/>
+
+Glass Scenes;
+
+<br/>
+<ApiImage alt="glass_next_tonemapped" src="/images/glass_next_tonemapped.png" heigth="100%" width="100%" caption="glass_next.png 74.711s"/>
+<br/>
+
+<br/>
+<ApiImage alt="glass_next_importance_tonemapped" src="/images/glass_next_importance_tonemapped.png" heigth="100%" width="100%" caption="glass_next_importance.png 79.2309s"/>
+<br/>
+
+<br/>
+<ApiImage alt="glass_next_russian_tonemapped" src="/images/glass_next_russian_tonemapped.png" heigth="100%" width="100%" caption="glass_next_russian.png 80.177s"/>
+<br/>
+
+<br/>
+<ApiImage alt="glass_next_importance_russian_tonemapped" src="/images/glass_next_importance_russian_tonemapped.png" heigth="100%" width="100%" caption="glass_next_importance_russian.png 79.3482s"/>
+<br/>
+
+<br/>
+<ApiImage alt="glass_tonemapped" src="/images/glass_tonemapped.png" heigth="100%" width="100%" caption="glass.png 24.8241s"/>
+<br/>
+
+<br/>
+<ApiImage alt="glass_importance_tonemapped" src="/images/glass_importance_tonemapped.png" heigth="100%" width="100%" caption="glass_importance.png 25.5334s"/>
+<br/>
+
+<br/>
+<ApiImage alt="glass_russian_tonemapped" src="/images/glass_russian_tonemapped.png" heigth="100%" width="100%" caption="glass_russian 26.7866s"/>
+<br/>
+
+<br/>
+<ApiImage alt="glass_importance_russian_tonemapped" src="/images/glass_importance_russian_tonemapped.png" heigth="100%" width="100%" caption="glass_importance_russian.png 26.2313s"/>
+<br/>
+
+## Conclusion
+
+It has been a great semester for me. I have learnt a lot in this class.
+Actually, it is the first time that I’m building this kind of a project.
+I’ve also read blogs of classmates and learnt a lot from them.
+
+<br/>
+
+I also want to render veach ajar and sponza scenes but I was dealing with
+bugs and did not have time. But I will definitely render them. I also want
+to use some scenes which are uploaded on sketchfab. I also want to try them
+with my raytracer.
+
+<br/>
+<ApiImage alt="veach_ajar_wrong.jpg" src="/images/veach_ajar_wrong.jpg" heigth="100%" width="100%" caption="veach_ajar_wrong.jpg"/>
+<br/>
+
+I’m trying to render veach ajar. I’m using low sample count for debugging purposes :D.
+Once it is finished, I will post it here.
+
+<br/>
+
+And here it is :D
+
+<br/>
+<ApiImage alt="veachAjar.jpg" src="/images/veachAjar.jpg" heigth="100%" width="100%" caption="veachAjar Path traced -> 1 day 8 hours (1920 – 1080 6400 samples)"/>
+<br/>
+
+## Some High Quality Images
+
+I can’t stop playing around with this :D. I have learnt how to use “screen” in
+inek machines so I’m using our ineks for creating these images.
+
+<br/>
+<ApiImage alt="DiffusePathTracingCornellbox" src="/images/diffusepathtracing-1.jpg" heigth="100%" width="100%" caption="diffuseCornellbox.jpg 3 hours 11 minutes (2048 * 2048 -> 1000 samples)"/>
+<br/>
+
+<br/>
+<ApiImage alt="GlassPathTracingCornellbox" src="/images/glass_next_importance_russian_tonemapped-3.png" heigth="100%" width="100%" caption="glassCornellbox.png 6 hours (2048 * 2048 -> 1000 samples)"/>
+<br/>
+
+This is the end of my journey. I'm really proud of this work of mine. It is the best but
+my first real work. I love it :D

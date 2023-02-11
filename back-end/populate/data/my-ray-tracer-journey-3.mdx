@@ -1,0 +1,426 @@
+---
+title: 'My Ray Tracer Journey - Part 2'
+publishedAt: '2021-04-23'
+summary: 'We implemented acceleration structures. I struggled a lot with GPU and decided to carry on with CPU implementation'
+headImageUrl: '/images/sciencetree_recursive.png'
+highlighted: 'true'
+---
+
+## Table Of Contents
+
+1. [Things I Did With GPU](/blog/my-ray-tracer-journey-3#things-i-did-with-gpu)
+2. [GPU Code Does Not Have Recursion](/blog/my-ray-tracer-journey-3#gpu-code-does-not-have-recursion)
+3. [CPU Based RayTracer](/blog/my-ray-tracer-journey-3#cpu-based-raytracer)
+4. [Parallelism](/blog/my-ray-tracer-journey-3#parallelism)
+5. [Rendering Results](/blog/my-ray-tracer-journey-3#rendering-results)
+6. [Conclusion](/blog/my-ray-tracer-journey-3#conclusion)
+7. [Soft Shading Added](/blog/my-ray-tracer-journey-3#soft-shading-added)
+
+## Overview
+
+In this two weeks, I was trying to implement a BVH tree with GLSL shaders.
+And then, I was going to implement recursive ray tracing (I failed :D). I
+immediately initiated another RayTracer project which runs on CPU. My CPU
+project runs a lot faster than GPU implementation. This proves that I need
+to learn a lot more things related to shader programming.
+
+<br/>
+
+I will mainly work on CPU part from now on. I will consider GPU part for the
+project part of the course. Learning concepts and implementing them comfortably
+is more important.
+
+<br/>
+
+Within 3 late days, I have managed to implement the things related to HW2 and
+I will share my comments and thoughts on things that I’ve encountered in detail.
+
+### Things I Did With GPU
+
+I first want to talk about my experience with compute shaders and the problems that
+I’ve encountered. I really like playing with shaders and I can implement most of the
+algorithms that I see with them. I really want to learn how to write clean an efficient
+shader code. However, it runs so sloooooowly and I cannot understand why. I guess I need
+to be an expert in order to fully understand what were my problems. While I was searching
+on the net, I saw people trying to understand what their shader code does by looking at
+the assembly codes created by shader compilers.
+
+<br/>
+
+I guess being a newbie shader programmer is not enough for creating optimized shaders.
+I need to have a deeper understanding about the inner structure of GPUs. Things were
+working great in the beginning especially when I was working on the first homework.
+But when recursive algorithms started coming I started having problems.
+
+### GPU Code Does Not Have Recursion
+
+I already knew that I could not implement recursive algorithms like BVH traversal
+and recursive ray tracing just like we normally do in CPU side. But I had solutions
+in my mind. Since speed was very important for us, I mainly focused on implementing
+a BVH traversal algorithm in compute shader.
+
+<br/>
+
+We all have some solutions in our minds for implementing recursive algorithms iteratively.
+We use stacks. It is one of the most convenient ways of implementing recursive algorithms
+iteratively. So, How I did that in compute shader?
+
+<br/>
+
+For BVH traversal, I implemented a stack
+
+<br/>
+
+```cpp:stack
+BVHNode nodeStack[MAX_STACK_LENGTH]
+```
+<br/>
+
+Here is my pseudo code for traversing the BVH:
+
+<br/>
+
+```cpp:bvh traverse
+IntersectionReport intersectBVH(Ray r, Mesh m)
+{
+    BVHNode rootNode = BVHNodes[mesh.rootBVHNode];
+    nodeStack[0] = rootNode;
+    int stackPointer = 1;
+    BVHNode current = nodeStack[0];
+    while(stackPointer >=1)
+    {
+        // Pop the stack
+        stackPointer--
+        current = nodeStack[stackPointer];
+
+        bool aabbIntersect = intersectBox(r, current.aabb, tmin, tmax);
+        if(aabbIntersect == true)
+        {
+            // Current node is a leaf
+            if(current.isLeaf == true)
+            {
+                IntersectionReport rprt = intersectFace(r, current.indices, tmin,tmax)
+                // Things related to face intersection
+                ...
+            }
+            // If it is not a leaf, we push children into the stack
+            else
+            {
+                nodeStack[stackPointer] = BVHNodes[current.rightNode];
+                stackPointer++;
+                nodeStack[stackPointer] = BVHNodes[current.leftNode];
+                stackPointer++;
+            }
+        }
+    }
+
+    return report;
+}
+```
+<br/>
+
+This algorithm is straightforward. I first flattened the BVH tree that I’ve constructed
+in CPU and sent it to the shader by using **Shader Storage Buffer Objects**. I had a giant
+BVHNode array which contains all the nodes coming from all the meshes in the scene. I just
+kept their offsets and reached them by using these offsets.
+
+<br/>
+
+However, this **destroyed** the speed gain. Shader started running ridiculously slow.
+Especially when tree heights are higher, shader becomes slower and slower. After searching
+through the net, I have learnt that checking things with if and else everywhere in the
+shader is not a proper approach. Shaders do not like branching because GPU is not created
+for these purposes. I needed to have another approach for BVH traversal. Implementing
+recursion with stacks is not efficient.
+
+<br/>
+
+I searched for a solution for a week :D. And finally I implemented this algorithm and
+it worked better. I flatten the BVH again, but I keep the elements in the array sorted
+in pre-order form. Just like how we traverse the BVH tree. For each node, I was keeping
+how many child nodes they have.
+
+<br/>
+
+So, my new algorithm was just looping that giant BVH node array and passing one index
+if bounding box intersects. Otherwise it jumps to the index of the other child at that
+level. This gave better results. But again, it was really really slow.
+
+<br/>
+
+Here are my rendering time results for some scenes;
+
+<br/>
+
+- **Bunny:** 14.719 ms
+- **ScienceTree:** 35.859 ms
+- **Car:** 115.773 ms
+- **Low Poly:** 153.762 ms
+- **Tower:** 140.304 ms
+- **Windmill:** 114.857 ms
+- **Berserker:** 51.798 ms
+- **ChineseDragon:** 1201.54 ms
+
+<br/>
+<ApiImage alt="chinese_dragon" src="/images/chinese_dragon.png" heigth="100%" width="100%" caption="chinese dragon output"/>
+<br/>
+
+So as the tree grows larger. My runtime is not like it is O(logn). It is because I am not capable of writing highly optimized
+GPU code for now 😦
+
+<br/>
+
+Here is a picture showing how much time I spend in intersection checking. More time is spent in brighter parts.
+
+<br/>
+<ApiImage alt="bvh_science_tree" src="/images/bvh_sciencetree.png" heigth="100%" width="100%" caption="bvh science tree"/>
+<br/>
+
+So, I dealt with BVH like that. After that, I started implementing recursive ray tracing. But how :D? Branching is a big sin.
+Stacks are highly inefficient. How should I do that. Again, only solution came into my mind was again implementing stacks. But
+here I could only make mirrors unfortunately. Dielectrics were really really hard to implement in GPU.
+
+<br/>
+<ApiImage alt="sciencetreemirror" src="/images/sciencetree_gpu_mirror.png" heigth="100%" width="100%" caption="Science Tree with only mirrors enabled. Rendered in 500ms"/>
+<br/>
+
+I could not finish this homework with shaders. Sağlık olsun :D. I will definitely return and clean
+the mess I made. But I had to finish my homework. In order to keep up with the class, I needed a
+solution. So I started a CPU based ray tracer. My experience with that was truly **Raytracing In One Weekend**.
+
+### CPU Based RayTracer
+
+I initiated another project immediately after I decided that dealing with GPU optimizations taking a lot of time. I moved my Ray Tracing algorithms
+in compute shaders to good old C++. Since I am comfortable with C++, I moved faster.
+
+<br/>
+
+I first rendered our hw1 images starting from simple.xml. Had a some minor errors and I resolved them thanks to GDB. After I saw that
+I correctly produce the results. I moved on hw2 related topics.
+
+<br/>
+
+I implemented the BVH tree without flattening. I used the traversal algorithm in our slides. I
+have used midpoint heuristics for splitting. I searched for some good and efficient ray-box
+intersection algorithms and found some on the internet. I guess that made my BVH traversal
+run faster. Furthermore, I also implemented the parallelism with C++ 11 features.
+
+<br/>
+
+### Parallelism
+
+I searched on the internet for efficient parallelism in RayTracing and saw some codes in stackoverflow,
+github etc. I also read blog posts of the classmates and tried to understand their approaches. After
+all, I learned that I need to asynchronously process every pixel with N number of threads where N
+is the number of cores in CPU. Here is the parallel technique I use. (I simplified the code a little bit):
+
+<br/>
+
+```cpp:parallelism with future
+std::atomic<int> count(0);
+std::vector<std::future<void> futureVector;
+int cores = std::thread::hardware_concurrency();
+while(cores--)
+{
+    futureVector.pushBack(std::async(std::launch::async, [=]()
+    {
+        while(true)
+        {
+            int index = count++;
+            if(index >= worksize)
+                break;
+
+            vec2 coords = GiveCoords(index, _imageWidth);
+            Ray primaryRay = ComputePrimaryRay(index, _imageWidth);
+            vec3 pixel = RayTrace(primaryRay);
+            WritePixelCoord(coords.x, coords.y, pixel);
+        }
+
+
+    }));
+}
+
+for(auto& element: futureVector)
+{
+    element.get();
+}
+```
+
+<br/>
+
+I saw this pattern of code which uses future and async in a lot of places.
+By using parallelism and BVH trees, I was ready for calculating the times.
+
+<br/>
+
+Low poly images gave great results. But chinese_dragon frustrated me a little bit.
+It was rendering it in 2 seconds while rendering others in 70 – 300 ms. Something
+was wrong. And I saw the problem after thinking for a day. I was just limiting the
+depth of my tree as 10. It was slow because of that. That tree depth was enough for
+small meshes but for large meshes, I needed deeper trees.
+
+<br/>
+
+After I increased the depth limit. I got really fast results which shocked me.
+
+<br/>
+
+<CustomTable variant="simple">
+  <TableCaption>Render Times Of Different Scenes</TableCaption>
+  <Thead>
+    <Tr>
+      <Th>Scene Name</Th>
+      <Th>Time</Th>
+    </Tr>
+  </Thead>
+  <Tbody>
+    <Tr>
+      <Td>Berserker</Td>
+      <Td>77.247 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Bunny</Td>
+      <Td>18.162 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Chinese Dragon</Td>
+      <Td>73.838 ms (I did not expect that fast)</Td>
+    </Tr>
+    <Tr>
+      <Td>Cornellbox Recursive</Td>
+      <Td>38.083 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Cornellbox</Td>
+      <Td>34.564 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Low Poly scene</Td>
+      <Td>238.048 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>ScienceTree Recursive</Td>
+      <Td>173.516 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>ScienceTree</Td>
+      <Td>67.676 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Tower</Td>
+      <Td>260.641 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Two Spheres</Td>
+      <Td>21.928 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Windmill</Td>
+      <Td>225.047 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Other Dragon</Td>
+      <Td>240.724 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Water Tap Frames</Td>
+      <Td>100 – 300 ms on average</Td>
+    </Tr>
+    <Tr>
+      <Td>Berserker</Td>
+      <Td>77.247 ms</Td>
+    </Tr>                                            
+  </Tbody>
+</CustomTable>
+
+### Some Errors
+
+Of course I had a lot of errors. For example;
+
+<br/>
+<ApiImage alt="chinese_dragon_error" src="/images/chinese_dragon_error.png" heigth="100%" width="100%" caption="weird dragon"/>
+<br/>
+
+I was trying to implement multithreaded rendering and getting this result.
+I was using index counter as std::atomic<int\>
+but it was not syncronized for some reason. But From that
+image, we can see that threads spend a lot less time when not
+hitting bounding boxes of dragon’s BVH. Another result like this;
+
+<br/>
+<ApiImage alt="sciencetree_error" src="/images/sciencetree_error.png" heigth="100%" width="100%" caption="weird science Tree"/>
+<br/>
+
+When handling dielectrics, I was hitting my head to the desk. I was getting
+close results to correct images but it was a little bit different. You can
+see that glass science tree is not correct. This panicked me a lot because
+it was already 20.00 PM and after 23.59, I was not allowed to resubmit my
+work in Odtuclass.
+
+<br/>
+<ApiImage alt="sciencetree_corrected" src="/images/sciencetree_corrected.gif" heigth="100%" width="100%" caption="error corrected"/>
+<br/>
+
+I found my mistake. It was really silly. While checking total reflection,
+I was calculating cosPhi as usual. But when calculating transmitted rays,
+I was just taking square root of cosPhi. This was the reason of my wrong
+results. I corrected it and everything worked smoothly after that.
+
+<br/>
+
+### Rendering Results
+
+I am happy with my BVH implementation since it runs a lot faster than I've expected.
+Here are some rendering results for images specific to HW2
+
+<br/>
+<ApiImage alt="chinese_dragon" src="/images/chinese_dragon.png" heigth="100%" width="100%" caption="chinese dragon"/>
+<br/>
+
+<br/>
+<ApiImage alt="cornellbox_recursive" src="/images/cornellbox_recursive.png" heigth="100%" width="100%" caption="cornellbox recursive"/>
+<br/>
+
+<br/>
+<ApiImage alt="sciencetree_recursive" src="/images/sciencetree_recursive.png" heigth="100%" width="100%" caption="sciencetree recursive"/>
+<br/>
+
+<br/>
+<ApiImage alt="spheres_recursive" src="/images/spheres_recursive.png" heigth="100%" width="100%" caption="spheres recursive"/>
+<br/>
+
+<br/>
+<ApiImage alt="other_dragon" src="/images/other_dragon.png" heigth="100%" width="100%" caption="other dragon"/>
+<br/>
+
+### Conclusion
+
+I panicked a lot in while implementing this homework because I thought that
+I was going to be left behind. But I managed to overcome the difficulties and
+kept up with my classmates I guess. I learned a good lesson from this. I should
+not take risks like that. Learning is more important. I think I will carry on
+with CPU implementation because I’m happy with its speed. But it does not mean
+that I will give up learning shader programming :D.
+
+<br/>
+
+### Soft Shading Added
+
+<br/>
+<ApiImage alt="softtap" src="/images/softtap.gif" heigth="100%" width="100%" caption="tap"/>
+<br/>
+
+<br/>
+<ApiImage alt="berserker_soft" src="/images/berserker_soft.png" heigth="100%" width="100%" caption="berserker"/>
+<br/>
+
+<br/>
+<ApiImage alt="bunny_soft" src="/images/bunny_soft.png" heigth="100%" width="100%" caption="bunny soft"/>
+<br/>
+
+[Part 3 is here](/blog/my-ray-tracer-journey-4)
+
+
+
+
+

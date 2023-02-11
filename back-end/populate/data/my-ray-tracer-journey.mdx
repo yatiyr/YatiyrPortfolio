@@ -1,0 +1,73 @@
+---
+title: 'My Ray Tracer Journey'
+publishedAt: '2021-09-25'
+summary: 'In context of Advanced Ray Tracing course. We implemented a ray tracer throughout the semester. It is implemented in C++ with a lot of interesting features. It can render some nice images :D'
+headImageUrl: '/images/veachAjar.jpg'
+highlighted: 'true'
+---
+
+### Overview
+
+This project was implemented during Spring 2020-2021 for Advanced Ray Tracing course. 
+We first started with basic intersections and got simple images but after a while, we 
+have studied more advanced techniques and our rendering results got a lot realistic.
+I opened a repository in [github](https://github.com/yatiyr/AdvancedRayTracerCPU). And 
+we also had to record our progress with blog posts.
+
+<br/>
+
+I first tried to implement this project with GLSL compute shaders but failed to follow
+the homeworks on time. So when I saw that it was tackling my progress, I immediately
+implemented a CPU version and carried on from there (This happened after 2nd Homework).
+
+<br/>
+
+At the end of the semester, I have a pet ray tracer as a programmer :D. I want to thank
+to our professor **Ahmet Oğuz Akyüz** for this amazing course and also to my classmates 
+(I've learnt a lot reading their blog posts).
+
+Feature list:
+
+- [x] Parallelism with C++ Async/Future
+- [x] BVH trees for mesh intersections
+- [x] Diffuse, Dielectric, Conductor materials
+- [x] Multisampling
+- [x] Motion Blur
+- [x] Glossy Reflections
+- [x] Depth Of Field
+- [x] Texture support
+- [x] Procedural Textures and Perlin Noise generator
+- [x] Advanced Lighting (Directional, Point, Area, Environment, Spot lights)
+- [x] HDR imaging and tone mapping
+- [x] BRDF models
+- [x] Object lights ( Light meshes and Light spheres)   
+- [x] Path tracing support
+
+During the course we recorded our progress with blog posts. Here are my blog posts in order;
+
+1. [First Images intersections, Implemented with GLSL Compute Shaders](/blog/my-ray-tracer-journey-2)
+2. [Parallelism C++ Async/Future, BVH trees, Dielectric, Conductor materials, problems with GPU, Soft Shading](/blog/my-ray-tracer-journey-3)
+3. [Motion Blur, Glossy Reflections, Depth of Field, Area Lights, Multisampling](/blog/my-ray-tracer-journey-4)
+4. [Texture Mapping, Procedural Textures](/blog/my-ray-tracer-journey-5)
+5. [Advanced Lighting, HDR Imaging and Tone Mapping](/blog/my-ray-tracer-journey-6)
+6. [BRDF Models](/blog/my-ray-tracer-journey-7)
+7. [Object Lights and Path Tracing](/blog/my-ray-tracer-journey-8)
+
+Some rendering results;
+
+<br/>
+
+<ApiImage alt="DiffusePathTracingCornellbox" src="/images/diffusepathtracing-1.jpg" heigth="100%" width="100%" caption="Diffuse Path Tracing Cornellbox"/>
+
+<br/>
+
+<ApiImage alt="GlassPathTracingCornellbox" src="/images/glass_next_importance_russian_tonemapped-3.png" heigth="100%" width="100%" caption="Glass Path Tracing Cornellbox"/>
+
+<br/>
+
+<ApiImage alt="Leviating Dragon" src="/images/head_env_light_dragon_tonemapped-1.png" heigth="100%" width="100%" caption="Leviating Dragon - Kadir Cenk Alpay's scene"/>
+
+<br/>
+
+I have learnt a lot with this project. It's not much but honest work :D. In the next blog post. I'll start explaining my journey. [Part 1](/blog/my-ray-tracer-journey-2) is about baby steps of
+my pet ray tracer.

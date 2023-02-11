@@ -1,0 +1,480 @@
+---
+title: 'My Ray Tracer Journey - Part 1'
+publishedAt: '2021-04-04'
+summary: 'First part of my journey. It is about basic intersections and project structure. I started with the idea of creating a GPU based ray tracer (big mistake for a beginner :D).'
+headImageUrl: '/images/low_poly_scene.png'
+highlighted: 'true'
+---
+
+## Table Of Contents
+
+1. [Overview](/blog/my-ray-tracer-journey-2#overview)
+2. [Project Details](/blog/my-ray-tracer-journey-2#project-details)
+3. [Scene Info](/blog/my-ray-tracer-journey-2#scene-info)
+4. [How I get Indices of Meshes](/blog/my-ray-tracer-journey-2#how-i-get-indices-of-meshes)
+5. [Shading Models and Rendering](/blog/my-ray-tracer-journey-2#shading-models-and-rendering)
+6. [Rendering Results](/blog/my-ray-tracer-journey-2#rendering-results)
+7. [How To Run The Renderer](/blog/my-ray-tracer-journey-2#how-to-run-the-renderer)
+8. [Conclusion](/blog/my-ray-tracer-journey-2#conclusion)
+
+
+## Overview
+
+I have been working on the first homework and since I was trying new things,
+I could not start my experiences earlier. I think now I can start explaining
+my initial experience in Advanced Ray Tracing course.
+
+<br/>
+
+I used to struggle a lot setting up my development environment when I was younger,
+I still do by the way. Because I'm not a senior developer yet :D. I’m not completely 
+happy with my current project structure and I will make it better in the upcoming weeks.
+
+<br/>
+
+
+### Project Details
+
+I wanted to implement my ray tracer in C++ with the help of **OpenGL** and **GLSL compute shaders**.
+I guess some friends had difficulties in the last years implementing a GPU based ray tracer.
+
+<br/>
+
+**Note From Future Eren** => You will have problems too kanka.
+
+<br/>
+
+Especially mapping some data structures like acceleration structures to the compute shader was the
+problem. Because of that, I also want to implement CPU versions of the functions that I wrote in
+compute shaders. I will explain all my solutions and thoughts, but now let's talk about my project
+structure.
+
+<br/>
+
+I'm using CMake to manage this project. External libraries that I use are;
+
+- **GLM:** For linear algebra and geometry stuff.
+- **Assimp:** I was using it while learning OpenGL. I guess I can load interesting models 
+              to my scenes using Assimp instead of always reading the scenes from xml files. 
+              But right now, I’m not focused on that. So it is disabled right now.
+- **GLFW3:** I’m using it to manage the window that I’m rendering my image.
+- **TinyXML2:** We used an already written xml parser using tinyxml2 for Ceng477 course, 
+                so I simply copied the code and changed it a little bit to fit it into my implementation.
+- **GLAD:** For loading OpenGL function pointers for me. I’m using OpenGL 4.6 for this project.
+- **STBI:** It is a header only image read/write tool, but I’m using it as a library because I don’t 
+            want to compile the code all the time. I simply add it as a library in my CMakeLists.txt file with tinyxml2 and glad.
+
+<br/>
+
+My renderer will have two modes. One for CPU rendering, the other one is for GPU rendering.
+Stangely, I have implemented GPU part right now but I will finish the CPU part as soon as possible.
+I don’t think it is going to be that much difficult because I have already implemented the algorithms
+in my compute shader.
+
+<br/>
+
+I want to explain my project structure with a UML diagram.
+
+<br/>
+<ApiImage alt="ProjectUMLDiagram" src="/images/projectUMLDiagram.png" heigth="100%" width="100%" caption="Project UML Diagram"/>
+<br/>
+
+This is the general structure of my project. I have a Renderer class which has render and compute programs.
+These programs just read and compile my glsl shaders and bind it to OpenGL context. There are two main rendering modes;
+
+- **OneTimeRender:** Renders the scene and saves it as a png image.
+- **RenderLoop:** Opens a GLFW window and renders the scene as a normal OpenGL application.
+
+<br/>
+
+After searching on the internet, I decided to implement OneTimeRender and RenderLoop functions by making a quad in
+vertex shader covering our viewport and writing a texture to that viewport in compute shader and then displaying it
+with fragment shader. I will also use this process to implement CPU based ray tracing part. But in that case, I will
+just write to my texture in the host and feed it back to my fragment shader. If I want to save rendered scenes as png
+files, I simply use a framebuffer and get image data and write the data as a png file using stbi utilities.
+
+<br/>
+
+I generate my texture like this. You might notice that I’m using floating points for my rgba channels.
+So I’m mapping 8 bit unsigned integer values between 0 and 1.
+
+<br/>
+
+```cpp:texture
+glGenTextures(1, &_textureHandle);
+
+glActiveTexture(GL_TEXTURE0);
+glBindTexture(GL_TEXTURE_2D, _textureHandle);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, 0);
+
+// in order to write to this texture we bind it to an image unit
+glBindImageTexture(0, _textureHandle, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+```
+
+<br/>
+
+My vertex shader is simple. It just draws a quad and feeds texture coordinates to the fragment shader;
+
+<br/>
+
+```cpp:vertexShader
+#version 460
+
+in vec2 pos;
+out vec2 texCoord;
+
+void main()
+{
+    texCoord = pos*0.5 + 0.5;
+    gl_Position = vec4(pos.x, pos.y, 0.0, 1.0);
+}
+```
+
+<br/>
+
+And my fragment shader simply writes the texture that we are using to the quad;
+
+<br/>
+
+```cpp:vertexShader
+#version 460
+
+uniform sampler2D srcTex;
+
+in vec2 texCoord;
+
+out vec4 color;
+
+void main()
+{
+    vec4 c = texture(srcTex, texCoord);
+    color = c;
+}
+```
+<br/>
+
+Compute shader does the heavy work here. I divide the job into width*height parts.
+Every pixel is computed in parallel.When I first managed to properly use compute
+shaders for every pixel, came up with these images. We can see that I can manipulate
+every pixel in parallel;
+
+<br/>
+<ApiImage alt="ComputeShaderTest1" src="/images/computeshadertest1.gif" heigth="100%" width="100%" caption="Compute Shader Test1"/>
+<br/>
+
+<br/>
+<ApiImage alt="ComputeShaderTest1" src="/images/computeshadertest2.gif" heigth="100%" width="100%" caption="Compute Shader Test2"/>
+<br/>
+
+### Scene Info
+
+I keep track of the scenes with Scene Manager class. In the future I might
+store different scenes and change them with user input in real time. For now,
+Scene class reads xml file provided and stores.
+
+<br/>
+
+The next thing I had to do was somehow send all the data that I’ve read to the GPU.
+I could not do that with uniforms because we determine scene in runtime. After a while
+I found out that I had to use shader storage buffer objects (ssbo’s) for this job. The
+thing I’m doing is storing my objects in CPU and mapping them to the GPU using shader
+storage buffer objects.
+
+<br/>
+
+For example, I store all the materials in an std::vector<Material\> member variable.
+And I wrote the Material struct like this;
+
+<br/>
+
+```cpp:materialStruct
+struct Material
+{
+    alignas(16) glm::vec3 ambientReflectance;
+    alignas(16) glm::vec3 diffuseReflectance;
+    alignas(16) glm::vec3 specularReflectance;
+    alignas(16) glm::vec3 mirrorReflectance;
+    float phongExponent;
+};
+```
+<br/>
+
+I’m using alignas(16) because I want my vec3’s to be aligned with 16 bytes.
+This is important because in glsl shaders vec3’s are aligned with 16 bytes.
+Since we are going to map all the vector elements in the shader, we have to
+make sure that the structs align properly. The material struct in the compute
+shader becomes like this;
+
+<br/>
+
+```cpp:materialStructShader
+struct Material
+{
+    vec3 ambientReflectance;
+    vec3 diffuseReflectance;
+    vec3 specularReflectance;
+    vec3 mirrorReflectance;
+    float phongExponent;
+};
+```
+<br/>
+
+In order to bind the Material vector to the shader, we need to call these opengl functions;
+
+<br/>
+
+```cpp:bindingMaterialVector
+// Bind materials array
+glGenBuffers(1, &ssbo_materials);
+glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_materials);
+glBufferData(GL_SHADER_STORAGE_BUFFER, _materials.size() * sizeof(Material), _materials.data(), GL_STATIC_DRAW);
+glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, ssbo_materials);
+glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+```
+<br/>
+
+So here, we first generate our buffer and bind it as GL_SHADER_STORAGE_BUFFER. And after that,
+we send the data to the buffer. We bind the buffer to 4th place(I don’t know what to call it because
+I’m a big opengl noob) with glBindBufferBase function. Lastly we access all our elements in material
+vector in our GPU by declaring this in our shader;
+
+<br/>
+
+```cpp:readingBufferInShader
+layout(std430, binding=4) buffer mtrls
+{
+	Material materials[];
+};
+```
+<br/>
+
+By doing all of these above, we can absolutely map any structure to our shaders. For example,
+I’m currently mapping all the elements in our scene(lights, vertex data, faces, mesh normals etc.)
+into compute shader like this.
+
+### How I get Indices of Meshes
+
+So, a question can be asked here. How do I get indices of meshes If I’m keeping all the indices which
+might be coming from different meshes in an array? The answer is that I’m storing two variables inside
+the Mesh struct, both in compute shader and the cpu side.
+
+<br/>
+
+```cpp:meshStruct
+struct Mesh
+{
+	int materialId;
+	int indicesOffset;
+	int indicesSize;
+};
+```
+<br/>
+
+I can determine where indices of that mesh starts by looking at indicesOffset and by looking at indicesSize,
+I can understand where it ends. So this is how I generally map the data structures I’m using into the GPU basically.
+
+### Shading Models and Rendering 
+
+I have two rendering modes, but for the first homework, I will be doing offscreen rendering with GPU(I will implement CPU side shortly).
+
+<br/>
+
+So, I only had two issues;
+
+<br/>
+
+First one was easy to handle. When I was trying to implement shadow rays and it was just producing ambient lights on the scenes.
+After a while, I realized that I did not implement tmin and tmax when checking ray intersections and fixed it.
+
+<br/>
+
+In the second one however, things got a little bit complicated. Since I’m using GPU here, especially in the scenes provided
+by our friend Akif Üslü, my computer started crashing :D(but I can see the results when I reboot). I rebooted the computer
+dozens of times and could not understand the reason behind it. But after a while, I think I got over with it. Now my computer
+does not crash. What I did was adding a memory barrier after “glDispatchCompute()” command. I think we have to do that for
+ensuring all the pixels are written to the texture before calling something else;
+
+<br/>
+
+```cpp:updateTexture
+void Renderer::UpdateTexture(float frame)
+{
+
+    glActiveTexture(GL_TEXTURE0);
+    glUseProgram(_computeProgram->id);  
+    glDispatchCompute(_width, _height, 1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    
+}
+```
+<br/>
+
+Oh, I was also creating a window for offscreen rendering. I create it right now to but I use;
+
+```cpp:windowHint
+glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+```
+<br/>
+
+in order to hide the window. This might be the solution as well. Or they might be working together.
+Now it seems there isn’t any problem left.
+
+### Rendering Results
+
+I want to mention one important thing about the scenes provided. I am not using colors as 8 bit
+unsigned integers. I am using floats between 0 and 1.0 instead. And because of that, I’m having
+problems with extremely high light intensities. My scenes become really bright because of that.
+So in xml files I’m tweaking light intensities(lowering it like 1/100) when I’m rendering them.
+
+<br/>
+
+I implemented a basic timer class for measuring rendering time. By taking advantage of c++ scopes,
+I’m measuring the time like this;
+
+<br/>
+
+```cpp:Timer
+{
+    Timer t;
+    // operations
+    // ...
+    std::cout << "Operation happened in --->";
+}
+```
+<br/>
+
+After this scope is over, timer’s destructor is called. Here I calculate the duration basically.
+I think this is fair enough.
+
+<br/>
+
+My rendering times include, getting the images from framebuffer and writing them to the file.
+Now, I’m ready to implement shading models and render our scenes.
+
+<br/>
+
+By the way, my GPU is NVIDIA GeForce RTX 2060 (I like playing games :D).
+
+<br/>
+
+So my rendering results;
+
+<br/>
+<ApiImage alt="simple" src="/images/simple.png" heigth="100%" width="100%" caption="simple.png (rendered in 0.159208s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="two_spheres" src="/images/two_spheres.png" heigth="100%" width="100%" caption="two_spheres.png (rendered in 0.144101s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="spheres" src="/images/spheres.png" heigth="100%" width="100%" caption="spheres.png (rendered in 0.159208s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="cornellbox" src="/images/cornellbox.png" heigth="100%" width="100%" caption="cornellbox.png (rendered in 0.159808s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="bunny" src="/images/bunny.png" heigth="100%" width="100%" caption="bunny.png (rendered in 1.0422s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="sciencetree" src="/images/sciencetree.png" heigth="100%" width="100%" caption="scienceTree.png (rendered in 2.17545s)"/>
+<br/>
+
+Again, thanks to our friend **Akif Üslü** for sharing his scenes. These are my results(I have changed light intensities because of the reasons I’ve mentioned).
+
+<br/>
+<ApiImage alt="car_front" src="/images/car_front.png" heigth="100%" width="100%" caption="car_front.png (rendered in 8.57986s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="car" src="/images/car.png" heigth="100%" width="100%" caption="car.png (rendered in 8.25843s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="low_poly_scene" src="/images/low_poly_scene.png" heigth="100%" width="100%" caption="low_poly_scene.png (rendered in 6.45574s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="tower" src="/images/tower.png" heigth="100%" width="100%" caption="tower.png (rendered in 8.0547s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="windmill" src="/images/windmill.png" heigth="100%" width="100%" caption="windmill.png (rendered in 5.71083s)"/>
+<br/>
+
+<br/>
+<ApiImage alt="berserker" src="/images/berserker.png" heigth="100%" width="100%" caption="berserker.png (2.15102s)"/>
+<br/>
+
+### How To Run The Renderer
+
+I also want to do a clarification about how to compile the project. It is a CMake project, Normally I do it like this;
+
+<br/>
+
+```bash:compile
+# In project root directory
+mkdir build
+cd build
+cmake ..
+make
+
+# We provide xml files to the program
+# the base folder will be counted as
+# the root of project
+# the scenes I used(and tweaked the lights)
+# are inside projectroot/assets/scenes/*.xml
+# so we will do this to render bunny.xml for example
+./AdvancedRayTracer assets/scenes/bunny.xml
+
+# The result will be in projectroot/build/outputs/*.png
+```
+<br/>
+
+Here is what I did to render tower.xml for example
+
+<br/>
+<ApiImage alt="compile" src="/images/compile.png" heigth="100%" width="100%" caption="configure cmake"/>
+<br/>
+
+<br/>
+<ApiImage alt="compile2" src="/images/compile2.png" heigth="100%" width="100%" caption="make and run"/>
+<br/>
+
+So now, tower.png will be in;
+
+<br/>
+
+```bash:compile
+~/Desktop/denemegithub/AdvancedRayTracer/build/outputs/tower.png
+```
+<br/>
+
+Another quick note: In homework1 zip, I’m giving glfw3 library
+but I think it might cause problems with other machines. I will
+try to change that I’m sorry. I hope it compiles well for this homework.
+
+### Conclusion
+
+I was working on this for a week and managed to properly map all scene structures to GPU. And then,
+I’ve implemented basic shading models (ambiend + diffuse + specular) and rendered the scenes with GPU.
+I think my rendering performance is a lot better than my implementation in Ceng477). It was a very hard
+semester for me and because of that high course load, I did not implement acceleration structures in my
+ray tracer.
+
+<br/>
+
+bunny.png for example, used to load in 32 seconds, now with GPU(without acceleration structures) I get that image
+in 1 seconds. I am very excited to see how it speeds up after I implement acceleration structures. I know that’s
+risky hocam but I really want to do that :D.
+
+<br/>
+
+[Part 2 is here](/blog/my-ray-tracer-journey-3)

@@ -1,0 +1,202 @@
+---
+title: 'My Ray Tracer Journey - Part 6'
+publishedAt: '2021-07-16'
+summary: 'In this part of our journey, we have added Bidirectional reflectance distribution functions to our ray tracers'
+headImageUrl: '/images/killeroo_blinnphong_tonemapped_weird.png'
+highlighted: 'true'
+---
+
+## Table Of Contents
+
+1. [Original Phong](/blog/my-ray-tracer-journey-7#original-phong)
+2. [Modified Phong](/blog/my-ray-tracer-journey-7#modified-phong)
+3. [Original Blinn - Phong](/blog/my-ray-tracer-journey-7#original-blinn---phong)
+4. [Modified Blinn - Phong](/blog/my-ray-tracer-journey-7#modified-blinn---phong)
+5. [Torrance Sparrow](/blog/my-ray-tracer-journey-7#torrance-sparrow)
+6. [Killeroo Scenes](/blog/my-ray-tracer-journey-7#killeroo-scenes)
+7. [Conclusion](/blog/my-ray-tracer-journey-7#conclusion)
+
+## Overview
+
+In this part, we have added Bidirectional reflectance distribution function (BRDF) to our ray tracers.
+This homework was simpler than the previous work we had done. We have added;
+
+- Phong
+- Modified Phong
+- Blinn - Phong
+- Modified Blinn - Phong
+- Torrance - Sparrow
+
+Models as BRDF functions. I started with adding new functions for reading BRDF
+information from our xml files. After I finished properly reading the information,
+I started my implementation.
+
+<br/>
+
+There are two principles we need to obey;
+
+1. Helmholtz reciprocity principle => $f(x,w_{i},w_{o}) = f(x,w_{o},w_{i})$ (our ray tracers are based on this principle I guess :D).
+2. Energy conservation principle => we cannot generate extra energy.
+
+As we learnt in class, our reflected radiance is calculated like this;
+
+$$
+    \int_{\Omega}L_{i}(x, \omega)f_{\lambda}(x, \omega_{i}, \omega_{o})\cos(\theta_{i})d\omega_{i}
+$$
+
+Actually, before this homework, we were using blinn – phong shading model so my code was designed according
+to that. So I changed my code a little bit here.
+
+<br/>
+
+I added a new function f(x, wi, wo) to my base light class to give modified values of
+diffuse and specular reflectances according to the BRDF model that we were using. And
+I used this function to calculate the color using the above equation.
+
+## Original Phong
+
+Here, we are using the angle between the perfect reflection of wi across the surface
+normal and wo direction. We cannot normalize this because it is already energy
+conserving. Here are my results for original phong inputs;
+
+<br/>
+<ApiImage alt="brdf_phong_original" src="/images/brdf_phong_original.png" heigth="100%" width="100%" caption="brdf_phong_original.png 54.592ms"/>
+<br/>
+
+## Modified Phong
+
+We do not divide specular reflectance with the cosine of angle between wi and surface
+normal and get modified phong model. We can normalize it. Here are my results;
+
+<br/>
+<ApiImage alt="brdf_phong_modified" src="/images/brdf_phong_modified.png" heigth="100%" width="100%" caption="phong_modified.png 51.787ms"/>
+<br/>
+
+Here is the normalized result;
+
+<br/>
+<ApiImage alt="brdf_phong_modified_normalized" src="/images/brdf_phong_modified_normalized.png" heigth="100%" width="100%" caption="phong_modified_normalized.png 62.339ms"/>
+<br/>
+
+## Original Blinn - Phong
+
+This is the shading model that we have been using. We calculate a half vector of wi and
+wo and look at the angle between this vector and the surface normal. That’s the idea of
+blinn-phong shading model. Here is my result;
+
+<br/>
+<ApiImage alt="brdf_blinnphong_original" src="/images/brdf_blinnphong_original.png" heigth="100%" width="100%" caption="brdf_blinnphong_original.png 69.346ms"/>
+<br/>
+
+## Modified Blinn - Phong
+
+Just like in the modified phong case, we do not divide the specular reflectance with the
+cosine of anglebetween wi and surface normal. We can normalize this model too. Here are
+my results;
+
+<br/>
+<ApiImage alt="brdf_blinnphong_modified" src="/images/brdf_blinnphong_modified.png" heigth="100%" width="100%" caption="brdf_blinnphong_modified.png 57.791ms"/>
+<br/>
+
+Here is the normalized output;
+
+<br/>
+<ApiImage alt="brdf_blinnphong_modified_normalized" src="/images/brdf_blinnphong_modified_normalized.png" heigth="100%" width="100%" caption="brdf_blinnphong_modified_normalized.png 51.875ms"/>
+<br/>
+
+## Torrance Sparrow
+
+In this model, we use fresnel reflection and treat the surface like it is made up from
+micro-facets. So in this model, we are using;
+
+- Distribution for probability of angle alpha ( angle between half vector and normal, we have used Blinn’s distribution here)
+- Geometry term (shadowing and masking properties of micro-facets are modelled with this term)
+- Fresnel term (Schlick’s approximation is said to be used)
+
+With this configuration, here is my result;
+
+<br/>
+<ApiImage alt="brdf_torrancesparrow_schlick" src="/images/brdf_torrancesparrow_schlick.png" heigth="100%" width="100%" caption="brdf_torrancesparrow.png"/>
+<br/>
+
+We can see that there is a little problem here because it does not match with
+the provided output. Thanks to the post I saw on ODTUClass written by our classmate,
+I understood that instead of using schlick’s approximation, we need to use the fresnel
+calculation that we have implemented for conductors. After changing the code according
+to that, here is my output;
+
+<br/>
+<ApiImage alt="brdf_torrancesparrow" src="/images/brdf_torrancesparrow.png" heigth="100%" width="100%" caption="brdf_torrancesparrow.png 54.091ms"/>
+<br/>
+
+## Killeroo Scenes
+
+Here I had some problems :D. I thought this would be one shot one kill type of
+homework but I was wrong. The first problem was I did not implement my raytracer
+to produce more than one image in one run. I had to implement it before but I forgot.
+First of all, I ensured rendering multiple cameras at once.
+
+<br/>
+
+Secondly, when I ran my raytracer I got this;
+
+<br/>
+<ApiImage alt="killeroo_blinnphong_tonemapped_weird" src="/images/killeroo_blinnphong_tonemapped_weird.png" heigth="100%" width="100%" caption="weird killeroo"/>
+<br/>
+
+I had no idea what was happening here at first (this pattern was cool though :D).
+Then, I carried on my usual debugging procedure. I started playing around with xml
+first and I changed degamma on killeroo mesh to false and saw the result;
+
+<br/>
+<ApiImage alt="killeroo_blinnphong_tonemapped" src="/images/killeroo_blinnphong_tonemapped.png" heigth="100%" width="100%" caption="gray killeroo"/>
+<br/>
+
+The pattern has gone. So I have a problem when I’m modifying diffuse and
+specular reflectances.
+
+<br/>
+
+In my code, I was traversing all light sources and giving them the
+intersection reports, material properties etc.. But I was giving
+reflectance coefficients as references. So that I was using degamma
+multiple times if I had more than one light sources. That was the case.
+
+<br/>
+
+So I corrected this mistake and got my results;
+
+<br/>
+<ApiImage alt="killeroo_blinnphong_tonemapped-2" src="/images/killeroo_blinnphong_tonemapped-2.png" heigth="100%" width="100%" caption="killeroo_blinnphong.png 5.31396s"/>
+<br/>
+
+<br/>
+<ApiImage alt="killeroo_blinnphong_closeup_tonemapped-1" src="/images/killeroo_blinnphong_closeup_tonemapped-1.png" heigth="100%" width="100%" caption="killeroo_blinnphong_closeup.png 11.9519s"/>
+<br/>
+
+<br/>
+<ApiImage alt="killeroo_torrancesparrow_tonemapped-1" src="/images/killeroo_torrancesparrow_tonemapped-1.png" heigth="100%" width="100%" caption="killeroo_torrancesparrow.png 3.6343s"/>
+<br/>
+
+<br/>
+<ApiImage alt="killeroo_torrancesparrow_closeup_tonemapped-1" src="/images/killeroo_torrancesparrow_closeup_tonemapped-1.png" heigth="100%" width="100%" caption="killeroo_torrancesparrow_closeup.png 12.506s"/>
+<br/>
+
+## Conclusion
+
+I have a little problem to be solved but it is not about brdfs, I guess
+it is because of how I implement soft shading. I realised the problem by
+looking closer to killeroo scenes, few amount of triangles do not seem
+smooth. I will solve this problem. I looked at the situation where I
+implemented texturing and saw that there was no problem about soft
+shading with killeroo scene. I must have broken something while calculating
+normals but could not find for now.
+
+<br/>
+
+Besides that, in this homework we have implemented BRDF models to our
+raytracers and I also have done some debugging and code cleaning.
+
+<br/>
+
+[Part 7 is here](/blog/my-ray-tracer-journey-8)
