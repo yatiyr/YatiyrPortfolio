@@ -1,8 +1,8 @@
 import { Box } from "@chakra-ui/layout";
 
 interface IconProps {
-    baseColor: any;
-    hoverColor: any;
+    baseColor?  : any;
+    hoverColor? : any;
 }
 
 export const MetuIcon = (props : IconProps) => {

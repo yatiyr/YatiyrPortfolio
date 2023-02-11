@@ -1,13 +1,23 @@
-import '@/styles/globals.css'
-import type { AppProps } from 'next/app'
+import { ChakraProvider, ColorModeProvider } from '@chakra-ui/react';
+import customTheme from 'styles/customTheme';
+import GlobalStyle from 'styles/global';
+import 'styles/globalSass.scss';
+import { MDXProvider } from '@mdx-js/react';
 
-// Importing Chakra Provider
-import { ChakraProvider } from '@chakra-ui/react'
+import MDXComponents from 'components/mdx';
 
-export default function App({ Component, pageProps }: AppProps) {
-  return(
-    <ChakraProvider>
-      <Component {...pageProps} />
+function MyApp({ Component, pageProps } : any) {
+  return (
+    <ChakraProvider resetCSS theme={customTheme}>
+      <ColorModeProvider options={{initialColorMode: "dark", useSystemColorMode: true}}>
+        <MDXProvider components={MDXComponents}>
+          <GlobalStyle>
+            <Component {...pageProps}/>
+          </GlobalStyle>
+        </MDXProvider>
+      </ColorModeProvider>
     </ChakraProvider>
   )
 }
+
+export default MyApp
