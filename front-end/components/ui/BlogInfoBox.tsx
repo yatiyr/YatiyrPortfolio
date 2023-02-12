@@ -1,6 +1,7 @@
 import { Badge, Box, Flex, Heading, Image, useColorModeValue, Text } from "@chakra-ui/react";
 
-import Link from "next/link";
+
+import NextLink from 'next/link';
 
 interface BlogInfoBoxInterface {
     slug?                 : any;
@@ -15,15 +16,19 @@ interface BlogInfoBoxInterface {
     description?          : any;
 }
 
+
+
 const BlogInfoBox = (props : BlogInfoBoxInterface) => {
+
 
     const cardContainerBg = useColorModeValue("white", "gray.900");
     const cardBorder      = useColorModeValue("none", "none");
     
+
     return (
-        <Link href={`blog/${props.slug}`} passHref>
+        <NextLink href={`blog/${props.slug}`} is="div" passHref>
             <Flex
-                as="a" 
+                as="div" 
                 flexDir="column"
                 width="100%"
                 justifyContent="start"
@@ -34,7 +39,7 @@ const BlogInfoBox = (props : BlogInfoBoxInterface) => {
                 _hover={{boxShadow: "0 12px 24px 0 rgba(0,0,0,0.2)", transform:"translate(0px, -10px)"}}
                 transition="0.3s"
                 cursor="pointer"
-                border={cardBorder}                
+                border={cardBorder}        
                 my="25px"
                  >
                 <Box marginBottom="10px"
@@ -80,8 +85,7 @@ const BlogInfoBox = (props : BlogInfoBoxInterface) => {
                         transition="background .3s, color .3s">
                         <Text>{props.description}</Text>
                     </Box>
-                    <Box as="a"
-                        href={props.slug}
+                    <Box as="div"
                         my="10px"
                         color={props.paragraphColor}
                         _hover={{color: props.linkHoverColor}}
@@ -97,7 +101,7 @@ const BlogInfoBox = (props : BlogInfoBoxInterface) => {
                     </Flex>                     
                 </Flex>
             </Flex>
-        </Link>
+        </NextLink>
     )
 }
 

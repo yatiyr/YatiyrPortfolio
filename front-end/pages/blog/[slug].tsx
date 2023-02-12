@@ -8,7 +8,8 @@ import { useColorModeValue } from "@chakra-ui/react";
 import BlogApi from "lib/api/blogs";
 
 const BlogContent = (props : any) => {
-    const { data, loading } = useGetUser();
+    const data  = "user"; //useGetUser();
+    const loading = false;
 
     const backgroundColor = useColorModeValue("white", "gray.900");
 

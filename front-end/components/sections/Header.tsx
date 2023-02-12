@@ -16,7 +16,6 @@ import { useColorModeValue,
          MenuItem,
          Box } from "@chakra-ui/react";
 
-import { isAuthorized } from 'utils/auth0';
 
 
 interface HeaderLinkInterface {
@@ -35,14 +34,13 @@ interface HeaderLinkInterface {
 
 const HeaderLink = (props : HeaderLinkInterface) => {
   return(
-    <NextLink href={props.to} passHref>
       <Button
         height={props.height}
         width={props.width}
         fontSize={props.fontSize}
         aria-label="Header Link"
         variant="ghost"
-        as="a"
+        as="div"
         color={props.baseColor}
         bg={props.backgroundColor}
         _focus={{boxShadow: "none"}}
@@ -52,9 +50,11 @@ const HeaderLink = (props : HeaderLinkInterface) => {
         minHeight="40px"
         transition="background .3s, color .3s"
       >
-        {props.text}
+        <NextLink href={props.to} passHref>
+          {props.text}
+        </NextLink>
       </Button>     
-    </NextLink>
+    
   )
 }
 
@@ -72,14 +72,13 @@ interface HeaderLogoInterface {
 
 const HeaderLogo = (props : HeaderLogoInterface) => {
   return (
-    <NextLink href="/" passHref>
       <Button
         fontSize="2xl"
         height="100%"
         width="100%"
         aria-label="Header Logo"
         variant="ghost"
-        as="a"
+        as="div"
         margin={props.margin}
         color={props.baseColor}
         bg={props.backgroundColor}
@@ -91,9 +90,11 @@ const HeaderLogo = (props : HeaderLogoInterface) => {
         transition="background .3s, color .3s"
         display={props.display}
       >
-        {props.text}
+        <NextLink href="/" passHref>
+          {props.text}
+        </NextLink>
       </Button>
-    </NextLink>
+    
   )
 }
 
@@ -109,42 +110,6 @@ interface AdminMenuInterface {
     menuToggled?           : any;
 };
 
-const AdminMenu = (props : AdminMenuInterface) => {
-  return (
-    <Menu>
-      <MenuButton 
-        userSelect="none"
-        as={Button}
-        alignItems="center"
-        justifyContent="center"
-        cursor="pointer"
-        color={props.baseColor}
-        bg={props.backgroundColor}
-        rounded={0}                
-        _hover={{background: props.hoverBackgroundColor, color: props.hoverColor}}
-        _active={{background: props.activeBackgroundColor, color: props.activeColor}}
-        _focus={{boxShadow: "none"}}        
-        width={props.menuToggled ? "100%" : "auto"}
-        transition="background .3s, color .3s"
-        zIndex="100"
-        >
-          Admin
-      </MenuButton>
-      <MenuList border="none" borderRadius="none" zIndex="100">
-        <MenuItem color={props.baseColor}
-                  _hover={{background: props.hoverBackgroundColor, color: props.hoverColor}}
-                  _active={{background: props.activeBackgroundColor, color: props.activeColor}}>
-          <NextLink href="/" passHref>Dashboard</NextLink>
-        </MenuItem>
-        <MenuItem color={props.baseColor}
-                  _hover={{background: props.hoverBackgroundColor, color: props.hoverColor}}
-                  _active={{background: props.activeBackgroundColor, color: props.activeColor}}>
-          <NextLink href="/" passHref>Create a Blog</NextLink>
-        </MenuItem>       
-      </MenuList>
-    </Menu>
-  )
-}
 
 interface HeaderMenuIconInterface {
     margin?                : any;
@@ -290,16 +255,6 @@ const Header = (props : HeaderInterface) => {
         <LinkIconElement padding="1rem 1rem 1rem 1rem"to="https://steamcommunity.com/id/yatiyr" baseColor={steamIconColor} hoverColor={steamIconHoverColor} activeColor={steamIconColor} icon={FaSteam}/>        
         <LinkIconElement padding="1rem 1rem 1rem 1rem"to="https://www.linkedin.com/in/eren-dere/" baseColor={linkedinIconColor} hoverColor={linkedinIconHoverColor} activeColor={linkedinIconColor} icon={FaLinkedin}/>                
         <LinkIconElement padding="1rem 1rem 1rem 1rem"to="https://github.com/yatiyr/" baseColor={steamIconColor} hoverColor={steamIconHoverColor} activeColor={steamIconColor} icon={FaGithub}/>
-        { !props.loading && 
-          <>
-            { props.user && 
-              <>
-                { isAuthorized(props.user, 'admin') && <AdminMenu menuToggled={menuToggled} hoverBackgroundColor={menuItemHoverColor} backgroundColor={backgroundColor} baseColor={headerLinkBaseColor} hoverColor={headerLinkHoverColor} activeColor={headerLinkActiveColor}/> }
-                <HeaderLink to="/api/v1/logout" text="Logout" baseColor={headerLinkBaseColor} hoverColor={headerLinkHoverColor} activeColor={headerLinkActiveColor} activeBackgroundColor={backgroundColor}/>        
-              </>
-            }
-          </>
-        }
       </Flex>
       {/* Desktop Part END! */}
 
@@ -359,32 +314,7 @@ const Header = (props : HeaderInterface) => {
           >
             <HeaderLink fontSize="3xl" width="100%" height="100%" to="/" text="Home" hoverBackgroundColor={menuItemHoverColor} baseColor={headerLinkBaseColor} hoverColor={headerLinkHoverColor} activeColor={headerLinkActiveColor} activeBackgroundColor={backgroundColor}/>            
             <HeaderLink fontSize="3xl" width="100%" height="100%" to="/about" text="About" hoverBackgroundColor={menuItemHoverColor} baseColor={headerLinkBaseColor} hoverColor={headerLinkHoverColor} activeColor={headerLinkActiveColor} activeBackgroundColor={backgroundColor}/>
-            <HeaderLink fontSize="3xl" width="100%" height="100%" to="/blog" text="Blog" hoverBackgroundColor={menuItemHoverColor} baseColor={headerLinkBaseColor} hoverColor={headerLinkHoverColor} activeColor={headerLinkActiveColor} activeBackgroundColor={backgroundColor}/>
-
-            { !props.loading && 
-              <>
-                { props.user && 
-                  <>
-                    { isAuthorized(props.user, 'admin') &&                     
-                      <Flex
-                      flexDirection="row"
-                      justifyContent="center"
-                      alignItems="center"
-                      flexGrow="1"
-                      minHeight="40px"
-                      cursor="pointer"
-                      _hover={{background: menuItemHoverColor}}
-                      _active={{background: backgroundColor}}
-                      transition="background .3s, color .3s">
-                        <AdminMenu menuToggled={menuToggled} hoverBackgroundColor={menuItemHoverColor} backgroundColor={backgroundColor} baseColor={headerLinkBaseColor} hoverColor={headerLinkHoverColor} activeColor={headerLinkActiveColor}/>
-                      </Flex>                    
-                    }
-                    <HeaderLink to="/api/v1/logout" text="Logout" hoverBackgroundColor={menuItemHoverColor} baseColor={headerLinkBaseColor} hoverColor={headerLinkHoverColor} activeColor={headerLinkActiveColor} activeBackgroundColor={backgroundColor}/>      
-                  </>
-                }
-
-              </>
-            }            
+            <HeaderLink fontSize="3xl" width="100%" height="100%" to="/blog" text="Blog" hoverBackgroundColor={menuItemHoverColor} baseColor={headerLinkBaseColor} hoverColor={headerLinkHoverColor} activeColor={headerLinkActiveColor} activeBackgroundColor={backgroundColor}/>           
             <Flex
               flexDirection="row"
               justifyContent="center"

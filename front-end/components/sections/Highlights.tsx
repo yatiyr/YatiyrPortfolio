@@ -18,7 +18,7 @@ const Highlights = (props : HighlightsInterface) => {
     return(
         <Flex
         justifyContent="start"
-        alignItems="center"
+        alignItems="stretch"
         flexDirection="column"
         my={{sm: "10px", lmd: "10px", md: "10px", lg: "40px", xl: "40px", "2xl": "40px"}}
         mx={{sm: "10px", lmd: "20px", md: "20px", lg: "75px", xl: "100px", "2xl": "150px"}}
@@ -55,7 +55,7 @@ const Highlights = (props : HighlightsInterface) => {
 
             <Flex
                     justifyContent="start"
-                    alignItems="center"
+                    alignItems="stretch"
                     flexDirection="column"
                     mx={{sm: "0px", lmd: "10px", md: "20px", lg: "30px", xl: "100px", "2xl": "150px"}}
                     >

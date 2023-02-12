@@ -23,7 +23,7 @@ const ProjectInfoBox = (props : ProjectInfoBox) => {
     return (
         <Link href={props.url} passHref>
             <Flex 
-                as="a"
+                as="div"
                 flexDir="column"
                 width="100%"
                 height="100%"

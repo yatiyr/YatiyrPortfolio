@@ -25,7 +25,7 @@ const BaseLayout = (props : BaseLayoutProps) => {
 
 
   const getClientLoc = async () => {
-    const res = await axios.get('https://geolocation-db.com/json/');
+    /*const res = await axios.get('https://geolocation-db.com/json/');
 
     const viewData = {
       ...res.data,
@@ -37,7 +37,7 @@ const BaseLayout = (props : BaseLayoutProps) => {
       await new ViewApi().saveView(viewData);
     } catch(error) {
 
-    }
+    }*/
   }
 
   const controllHeader = () => {

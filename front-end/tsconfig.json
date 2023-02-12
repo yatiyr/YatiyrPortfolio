@@ -19,6 +19,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "utils/mdx.js", "utils/mdx.js", "utils/auth0.js", "styles/icons/customIcons.js", "styles/fonts/fonts.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "utils/mdx.js", "utils/mdx.js", "styles/icons/customIcons.js", "styles/fonts/fonts.js"],
   "exclude": ["node_modules"]
 }

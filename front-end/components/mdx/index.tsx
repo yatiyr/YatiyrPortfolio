@@ -3,7 +3,7 @@ import { Heading, Link as ChakraLink,
     UnorderedList, OrderedList,
     Divider, Box, Flex, Table,
     TableCaption, Thead, Tr, Th, Tfoot, Tbody, Td } from "@chakra-ui/react";
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { Image } from "@chakra-ui/image";
 
 
@@ -16,11 +16,9 @@ const isInternalLink = href && (href.startsWith('/') || href.startsWith('#'));
 
 if(isInternalLink) {
    return (
-       <Link href={href} passHref>
-           <ChakraLink color={linkColor} {...props} fontWeight="bold" className="mdx" animation={linkColor === "gray.100" ? "glow 1s ease-in-out infinite alternate" : ""}>
-               {props.children}
-           </ChakraLink>
-       </Link>
+        <ChakraLink href={href} color={linkColor} {...props} fontWeight="bold" className="mdx" animation={linkColor === "gray.100" ? "glow 1s ease-in-out infinite alternate" : ""}>
+            {props.children}
+        </ChakraLink>
    )
 }
 

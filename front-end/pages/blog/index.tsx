@@ -8,7 +8,8 @@ import dateFormat from 'dateformat';
 
 const Blog = (props : any) => {
   // Load user information
-  const { data, loading } = useGetUser();
+  const data = "user";
+  const loading = false;
 
   const backgroundColor = useColorModeValue("white", "gray.900");
   const headingColor = useColorModeValue("gray.700","gray.200");
@@ -27,7 +28,7 @@ const Blog = (props : any) => {
           flexDirection="column"
           justifyContent="start"
           justifySelf="center"
-          alignItems="center"
+          alignItems="stretch"
           minHeight="100vh"
           mx={{sm: "0px", lmd: "0px", md: "130px", lg: "160px", xl: "200px", "2xl": "230px"}}          >
             {props.blogs.map((blog : any, index : any) => (

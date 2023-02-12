@@ -4,7 +4,8 @@ import { Heading, useColorModeValue } from "@chakra-ui/react";
 
 const Cv = () => {
   // Load user information
-  const { data, loading } = useGetUser();
+  const data = "user";
+  const loading = false;
 
   const backgroundColor = useColorModeValue("white", "gray.900");
   

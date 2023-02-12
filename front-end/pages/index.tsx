@@ -7,8 +7,8 @@ import BlogApi from 'lib/api/blogs';
 const Home = (props : any) => {
 
   // Load user information
-  const { data, loading } = useGetUser();
-
+  const data = "user";
+  const loading = false;
   const backgroundColor = useColorModeValue("white", "gray.900");
 
   return (
@@ -18,10 +18,22 @@ const Home = (props : any) => {
         loading={loading}
         backgroundColor={backgroundColor}
         page="Home">
-        <IndexMain highlightedBlogs={props.blogs}/>                                                                                                             
+          <IndexMain highlightedBlogs={props.blogs}/>   
       </BaseLayout>
     </>
   )
+
+  /*return (
+    <>
+      <BaseLayout
+        user={data}
+        loading={loading}
+        backgroundColor={backgroundColor}
+        page="Home">
+        <IndexMain highlightedBlogs={props.blogs}/>                                                                                                             
+      </BaseLayout>
+    </>
+  ) */
 }
 
 export async function getStaticProps() {

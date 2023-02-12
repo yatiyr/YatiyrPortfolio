@@ -7,7 +7,8 @@ import Work from 'components/sections/Work';
 
 const About = () => {
   // Load user information
-  const { data, loading } = useGetUser();
+  const data = "user";
+  const loading = false;
 
   const backgroundColor = useColorModeValue("white", "gray.900");
   const headingColor = useColorModeValue("gray.700","gray.200");

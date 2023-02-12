@@ -21,7 +21,7 @@ const SocialIcon = (props : SocialIconInterface) => {
         <NextLink href={props.to} passHref>
             <Box 
             padding={props.padding}
-            as="a">
+            as="div">
             <Icon
                 w="50px"
                 h="50px"

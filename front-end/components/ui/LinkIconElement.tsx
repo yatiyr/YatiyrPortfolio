@@ -18,7 +18,7 @@ const LinkIconElement = (props : LinkIconElementInterface) => {
             display="flex"
             alignItems="center"
             padding={props.padding}
-            as="a"
+            as="div"
             height="100%"
             width="100%"
             maxHeight="8rem">
