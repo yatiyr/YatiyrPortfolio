@@ -8,7 +8,7 @@ const fonts = {
     heading: `Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"`
 };
 
-const breakpoints = createBreakpoints({
+const breakpoints = {
     sm: "10em",
     slmd: "33em",
     lmd: "41em",
@@ -16,7 +16,7 @@ const breakpoints = createBreakpoints({
     lg: "62em",
     xl: "80em",
     "2xl": "96em",
-});
+};
 
 const overrides = {
     ...chakraTheme,

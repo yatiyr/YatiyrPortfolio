@@ -1,41 +1,51 @@
 export const projects = [
     {
         owner: "yatiyr",        
-        title: "yatiyr-portfolio",
+        title: "OP Engine",
         url: "https://github.com/yatiyr/yatiyr-portfolio",
-        description: "In other project, I was learning how to use api's and connect to databases and fetch data from those places. But I also want to build a customized, modern looking blog website. So here, I also started learning Chakra-UI. This work is on progress. I will implement functionalities after I finish frontend parts. It will be much easier that way.",
-        language: "JavaScript"
+        imagePath: "./images/OP_Engine_RoughnessMetalness.PNG",
+        years: "2022",
+        description: "A Game Engine written in C++. It supports PBR rendering, C# scripting and can handle 3D Physics. It also has a level editor called OP Editor.",
+        language: "C++, C#"
     },
 
     {
         owner: "yatiyr",        
         title: "AdvancedRayTracer",
         url: "https://github.com/yatiyr/AdvancedRayTracerCPU",
-        description: "It's not perfect to be honest, but I'm proud of this work. My best project so far :D",
+        imagePath: "./images/veachAjarPathTraced.png",
+        years: "2021",
+        description: "My own path tracer. It utilizes data structrures such as BVH trees and multi threading for performance optimizations. This was my first step to become a graphics programmer.",
         language: "C++"
     },
 
     {
         owner: "yatiyr",
-        title: "AlgorithmProblems",
-        url: "https://github.com/yatiyr/AlgorithmProblems",
-        description: "I solve some algorithm problems and commit my answers here",
-        language: "no specific language"
-    },
-
-    {
-        owner: "yatiyr",
-        title: "MathematicsStudies",
-        url: "https://github.com/yatiyr/mathematicsStudies",
-        description: "I want to improve my applied math skills :D",
+        title: "YatiyrPortfolio",
+        url: "https://github.com/yatiyr/YatiyrPortfolio",
+        imagePath: "./images/portfolioSite.png",
+        years: "2021",
+        description: "This is my portfolio project and the site you're currently in. NextJS and Chakra UI have been used in the project.",
         language: "C++"
     },
 
     {
         owner: "yatiyr",
-        title: "ParallelComputing",
-        url: "https://github.com/yatiyr/ParallelComputing",
-        description: "Jacobi, Gaussian and Chebyshev solvers in parallel (from a noob :D)",
+        title: "ImageCompress",
+        url: "https://github.com/yatiyr/imageCompress",
+        imagePath: "./images/imageCompress.png",
+        years: "2021",
+        description: "This project compresses images using k-means clustering algorithm. I implemented this for machine learning course. Stb_image is used for reading images.",
+        language: "C++"
+    },
+
+    {
+        owner: "yatiyr",
+        title: "SwarmBattle",
+        url: "https://github.com/yatiyr/SwarmBattle",
+        imagePath: "./images/interceptionExample.gif",
+        years: "2020",
+        description: "A scenario of two teams attack eachother with rockets and their swarm robots try to intercept rockets. Box2D is used as the physics engine and SFML is used for displaying entities.",
         language: "C++"
     },
 
@@ -43,7 +53,9 @@ export const projects = [
         owner: "yatiyr",
         title: "OpenGLStudies",
         url: "https://github.com/yatiyr/OpenGLStudies",
-        description: "Don't forget your ultimate goal Eren. To be a real graphics programmer, you need to understand OpenGL really well",
+        imagePath: "./images/normal_parallax_mapping.gif",
+        years: "2020",
+        description: "I started learning OpenGL in 2021 on my own by reading blogs of Joey De Vries and thanks to him, I have learnt the basiscs.",
         language: "C++"
     }
 

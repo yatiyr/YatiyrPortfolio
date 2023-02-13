@@ -37,11 +37,13 @@ const Highlights = (props : HighlightsInterface) => {
                         owner={project.owner}
                         title={project.title}
                         url={project.url}
+                        imagePath={project.imagePath}
+                        years={project.years}
                         description={project.description}
                         language={project.language}
                         headingColor={props.headingColor}
                         paragraphColor={props.paragraphColor}
-                        linkHoverColor={props.linkHoverColor}                        />                        
+                        linkHoverColor={props.linkHoverColor}/>                        
                 ))}
             </SimpleGrid>
 

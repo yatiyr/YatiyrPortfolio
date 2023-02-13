@@ -72,7 +72,7 @@ const WelcomeSection = (props : WelcomeSectionInterface) => {
                 <Image 
                     boxSize="400px"
                     objectFit="cover"
-                    src="/images/erenAvatar1.jpeg"
+                    src="/images/erenAvatar.jpg"
                     alt="eren"
                     boxShadow="0 4px 15px 0 rgba(0, 0, 0, 0.7), 0 6px 20px 0 rgba(0, 0, 0, 0.3)"/>
                 <Flex
@@ -90,8 +90,9 @@ const WelcomeSection = (props : WelcomeSectionInterface) => {
                                 <TypeAnimation
                                     sequence={[
                                         "About",
-                                        1000,
-                                        " Me"
+                                        1500,
+                                        " Me",
+                                        1000
                                     ]}
                                     wrapper="div"
                                     cursor={true}
@@ -104,9 +105,10 @@ const WelcomeSection = (props : WelcomeSectionInterface) => {
                             my="0px"
                             fontSize = {{sm: "xl", lmd: "xl", md: "md", lg: "lg", xl: "xl", "2xl": "xl"}}
                             transition="background .3s, color .3s">
-                            I&apos;m Eren. I am a graduate student in
-                            Middle East Technical University, Computer Engineering Department, Ankara, Turkey. Here, I will post my fun
-                            projects and also keep track of the things I&apos;m trying to
+                            I&apos;m Eren. I am a graduate student and a teaching assistant in
+                            Middle East Technical University, Computer Engineering Department, Ankara, Turkey.
+                            I love graphics programming and I&apos;m trying to learn everthing what is necessary
+                            to become a good graphics programmer. Here, I will post my fun projects and also keep track of the things I&apos;m trying to
                             learn. 
                         </Text>
                     <Flex
