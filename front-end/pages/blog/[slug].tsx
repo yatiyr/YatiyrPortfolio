@@ -31,8 +31,26 @@ export async function getStaticPaths() {
     const json = await new BlogApi().getAll();
     const blogs = json.data;
 
+    let processedBlogs = new Array();
+
+    const typeKeys = Object.keys(blogs);
+
+    for(let typeKey of typeKeys)
+    {
+        const seriesKeys = Object.keys(blogs[typeKey]);
+
+        for (let seriesKey of seriesKeys)
+        {
+            for(let obj of blogs[typeKey][seriesKey])
+            {
+                let parsed = JSON.parse(obj);
+                processedBlogs.push(parsed);
+            }
+        }
+    }
+
     return {
-        paths: blogs.map((p : any) => ({
+        paths: processedBlogs.map((p : any) => ({
             params: {
                 slug: p.slug
             }

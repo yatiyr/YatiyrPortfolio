@@ -2,6 +2,56 @@ const mongoose   = require('mongoose');
 const Blog       = mongoose.model('Blog');
 const readingTime = require('reading-time');
 
+processBlogs = (blogs) => {
+
+
+    const processedBlogsJson =
+    {
+        "graphics": {
+            no_series: new Array()
+        },
+        "game/engine dev": {
+            no_series: new Array()
+        },
+        "other dev": {
+            no_series: new Array()
+        },
+        "music and arts": {
+            no_series: new Array()
+        },
+        "life": {
+            no_series: new Array()
+        },
+        "courses": {
+            no_series: new Array()
+        }
+    }
+
+    for (blog of blogs)
+    {
+        const postType = blog.postType;
+        const series   = blog.series;
+
+        if (series === "")
+        {
+            processedBlogsJson[postType]["no_series"].push(JSON.stringify(blog));
+        }
+        else if(processedBlogsJson[postType][series] == undefined)
+        {
+            processedBlogsJson[postType][series] = new Array();
+            processedBlogsJson[postType][series].push(JSON.stringify(blog));
+        }
+        else
+        {
+            processedBlogsJson[postType][series].push(JSON.stringify(blog));
+        }
+
+    }
+
+    return processedBlogsJson;
+}
+
+
 exports.getBlogs = async (req, res) => {
     const blogs = await Blog.find({}).sort({publishedAt: 1});
     const reducedBlogs = blogs.reduce((allBlogs, blogData) => {
@@ -14,6 +64,7 @@ exports.getBlogs = async (req, res) => {
                 headImageUrl: blogData.headImageUrl,
                 highlighted: blogData.highlighted,
                 postType: blogData.postType,
+                series: blogData.series,
                 updatedAt: blogData.updatedAt,
                 frontMatter: {
                     wordCount: blogData.content.split(/\s+/gu).length,
@@ -24,7 +75,9 @@ exports.getBlogs = async (req, res) => {
         ]
     }, []);
 
-    return res.json(reducedBlogs);
+    const processedBlogs = processBlogs(reducedBlogs);
+
+    return res.json(processedBlogs);
 }
 
 exports.getHighlightedBlogs = async (req, res) => {
@@ -39,6 +92,7 @@ exports.getHighlightedBlogs = async (req, res) => {
                 headImageUrl: blogData.headImageUrl,
                 highlighted: blogData.highlighted,
                 postType: blogData.postType,
+                series: blogData.series,
                 updatedAt: blogData.updatedAt,
                 frontMatter: {
                     wordCount: blogData.content.split(/\s+/gu).length,
@@ -64,6 +118,7 @@ exports.getBlogsByPostType = async (req, res) => {
                 headImageUrl: blogData.headImageUrl,
                 highlighted: blogData.highlighted,
                 postType: blogData.postType,
+                series: blogData.series,
                 updatedAt: blogData.updatedAt,
                 frontMatter: {
                     wordCount: blogData.content.split(/\s+/gu).length,
@@ -76,6 +131,7 @@ exports.getBlogsByPostType = async (req, res) => {
 
     return res.json(reducedBlogs);
 }
+
 
 
 exports.getBlogBySlug = async (req, res) => {

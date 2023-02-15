@@ -9,7 +9,8 @@ const blogSchema = new Schema({
     headImageUrl: {type: String, required: false},
     highlighted: {type: String, required: true},
     content: {type: String, required: true},
-    postType: {type: String, default: 'ed_job', enum: ['ed_job', 'travel', 'friends_family']},
+    postType: {type: String, default: 'graphics', enum: ['graphics', 'game/engine dev', 'other dev', 'courses', 'music and arts', 'life'], required: false},
+    series: {type: String, required: false},
     status: {type: String, default: 'draft', enum: ['draft', 'published', 'deleted']},
     updatedAt: {type: Date}
 });

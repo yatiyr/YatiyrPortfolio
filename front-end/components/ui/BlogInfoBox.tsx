@@ -26,7 +26,7 @@ const BlogInfoBox = (props : BlogInfoBoxInterface) => {
     
 
     return (
-        <NextLink href={`blog/${props.slug}`} is="div" passHref>
+        <NextLink href={`blog/${props.slug}`} is="div" draggable="false" passHref>
             <Flex
                 as="div" 
                 flexDir="column"
@@ -34,6 +34,8 @@ const BlogInfoBox = (props : BlogInfoBoxInterface) => {
                 justifyContent="start"
                 alignItems="center"
                 textOverflow="ellipsis"
+                userSelect="none"
+                draggable="false"
                 backgroundColor={cardContainerBg}
                 boxShadow="0 4px 8px 0 rgba(0,0,0,0.2)"
                 _hover={{boxShadow: "0 12px 24px 0 rgba(0,0,0,0.2)", transform:"translate(0px, -10px)"}}
@@ -54,6 +56,7 @@ const BlogInfoBox = (props : BlogInfoBoxInterface) => {
                     height="200px"
                     width="100%"
                     userSelect="none"
+                    draggable="false"
                     src={`${process.env.PORTFOLIO_API_URL}/media/${props.imagePath}`}
                     alt="blogInfo"
                     />
