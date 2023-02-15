@@ -11,7 +11,7 @@ export const projects = [
 
     {
         owner: "yatiyr",        
-        title: "AdvancedRayTracer",
+        title: "Advanced RayTracer",
         url: "https://github.com/yatiyr/AdvancedRayTracerCPU",
         imagePath: "./images/veachAjarPathTraced.png",
         years: "2021",

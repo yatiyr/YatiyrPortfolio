@@ -34,7 +34,8 @@ const ProjectInfoBox = (props : any) => {
                     <Flex flexDir="row"
                         width="100%"
                         padding="10px 0px"
-                        justifyContent="space-between">
+                        justifyContent="space-between"
+                        flexWrap="wrap">
                         <Heading
                                 _hover={{color: props.linkHoverColor}}                             
                                 color={props.headingColor}

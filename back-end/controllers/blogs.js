@@ -1,6 +1,7 @@
 const mongoose   = require('mongoose');
 const Blog       = mongoose.model('Blog');
 const readingTime = require('reading-time');
+const blog = require('../db/models/blog');
 
 processBlogs = (blogs) => {
 
@@ -27,13 +28,14 @@ processBlogs = (blogs) => {
         }
     }
 
-    for (blog of blogs)
+    for (let blog of blogs)
     {
         const postType = blog.postType;
         const series   = blog.series;
 
         if (series === "")
         {
+            
             processedBlogsJson[postType]["no_series"].push(JSON.stringify(blog));
         }
         else if(processedBlogsJson[postType][series] == undefined)
@@ -44,7 +46,9 @@ processBlogs = (blogs) => {
         else
         {
             processedBlogsJson[postType][series].push(JSON.stringify(blog));
-        }
+        }            
+
+
 
     }
 
@@ -103,7 +107,9 @@ exports.getHighlightedBlogs = async (req, res) => {
         ]
     }, []);    
 
-    return res.json(reducedBlogs);
+    const processedBlogs = processBlogs(reducedBlogs);
+
+    return res.json(processedBlogs);
 }
 
 exports.getBlogsByPostType = async (req, res) => {

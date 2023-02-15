@@ -1,4 +1,4 @@
-import { Badge, Flex, Heading, Image, Text, useColorModeValue } from '@chakra-ui/react';
+import { Badge, Divider, Flex, Heading, Image, Text, useColorModeValue } from '@chakra-ui/react';
 import IconElement from 'components/ui/IconElement';
 import { MetuIcon, CengIcon } from 'styles/icons/customIcons';
 //import Typed from 'react-typed';
@@ -82,6 +82,7 @@ const IndexMain = (props : IndexMainInterface) => {
     return(
         <>
             <WelcomeSection/>
+            <Divider marginY="75px" color={linkHoverColor}></Divider>
             <Highlights
                 headingColor={headingColor}
                 paragraphColor={paragraphColor}
