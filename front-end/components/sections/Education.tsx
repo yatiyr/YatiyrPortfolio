@@ -11,10 +11,18 @@ const Education = () => {
 
   return (
     <>
+        <EducationWorkInfoBox
+            title="METU" 
+            icon={<MetuIcon baseColor={metuIconColor}/>}
+            yearsBetween="2023-ongoing"
+            details="PhD Computer Engineering"
+            location="Ankara - Turkey"
+            headingColor={headingColor}
+            paragraphColor={paragraphColor}/>
         <EducationWorkInfoBox 
             title="METU" 
             icon={<MetuIcon baseColor={metuIconColor}/>}
-            yearsBetween="2020-Ongoing"
+            yearsBetween="2020-2023"
             details="M.Sc. Computer Engineering"
             cgpa="CGPA: 4.00"
             location="Ankara - Turkey"

@@ -59,8 +59,6 @@ const Home = (props : any) => {
     }
   }
 
-  console.log(blogs);
-
   return (
     <>
       <BaseLayout

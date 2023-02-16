@@ -61,7 +61,7 @@ const WelcomeSection = (props : WelcomeSectionInterface) => {
     return(
         <Flex
             flexDirection={{sm: "column", lmd: "column", md: "row", lg: "row", xl: "row", "2xl": "row"}}
-            minHeight={{sm: "850px", lmd: "750px", md: "600px", lg: "700px", xl: "700px", "2xl": "700px"}}
+            minHeight={{sm: "1000px", lmd: "750px", md: "600px", lg: "700px", xl: "700px", "2xl": "700px"}}
             zIndex="1"
             justifyContent={{sm: "start", lmd: "start", md: "start", lg: "center", xl: "center", "2xl": "center"}}
             alignItems={{sm: "center", lmd: "center", md: "start", lg: "center", xl: "center", "2xl": "center"}}            

@@ -131,7 +131,6 @@ const Highlights = (props : any) => {
              fontSize={{sm: "lg", lmd: "xl", md: "2xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
              color={props.headingColor}>
 
-                ASDASD
             </Text>
             <SimpleGrid my="20px" columns={[1, 1, 2, 3]} spacing="40px">
                 {projects.map((project : any, index : any) => (

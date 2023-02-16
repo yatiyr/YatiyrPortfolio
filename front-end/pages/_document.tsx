@@ -7,7 +7,7 @@ export default class MyDocument extends NextDocument {
       <Html lang="en">
         <Head />
           <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-          <link rel="icon" type="image/jpeg" href="/images/erenAvatar1.jpeg" />        
+          <link rel="icon" type="image/jpeg" href="/images/erenAvatar.jpg" />        
           <body>
             <ColorModeScript />
             <Main />
