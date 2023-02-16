@@ -1,11 +1,11 @@
-const config = require('../config/dev');
+//const config = require('../config/dev');
 const mongoose = require('mongoose');
 
 require('./models/blog');
 require('./models/view');
 
 exports.connect = () => {
-    return mongoose.connect(config.DB_URI, {
+    return mongoose.connect(process.env.DB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true
         }, (err) => {

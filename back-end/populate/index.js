@@ -1,8 +1,10 @@
-const config = require('../config/dev');
+require('dotenv').config();
+
+//const config = require('../config/dev');
 const mongoose = require('mongoose');
 const fakeDB = require('./FakeDB');
 
-mongoose.connect(config.DB_URI, {
+mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }, async (err) => {
