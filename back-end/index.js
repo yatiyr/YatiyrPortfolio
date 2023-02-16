@@ -13,7 +13,7 @@ async function runServer() {
     server.use('/api/v1/media', require('./routes/media'));
     server.use('/api/v1/views', require('./routes/views'));
     
-    const PORT = parseInt(process.env.PORT, 10) || 3001;
+    const PORT = 3001;
     server.listen(PORT, (err) => {
         if(err) console.error(err);
         console.log('Server ready on port:', PORT);
