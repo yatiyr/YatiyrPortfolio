@@ -22,6 +22,14 @@ module.exports = withMDX({
     return config;
   },
 
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.PORTFOLIO_API_URL}/:path`,
+      },
+    ]
+  },
 
   env: {
     BASE_URL: process.env.AUTH0_BASE_URL,

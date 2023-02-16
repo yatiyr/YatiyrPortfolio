@@ -7,11 +7,17 @@ import { useGetUser } from "actions/user";
 import { useColorModeValue } from "@chakra-ui/react";
 import BlogApi from "lib/api/blogs";
 
+
+import Giscus from "@giscus/react";
+
+
 const BlogContent = (props : any) => {
     const data  = "user"; //useGetUser();
     const loading = false;
 
     const backgroundColor = useColorModeValue("white", "gray.900");
+
+    const giscusColor = useColorModeValue("Light", "Dark");
 
     return (
         <>
@@ -22,6 +28,22 @@ const BlogContent = (props : any) => {
                 frontMatter={props.frontMatter}
                 page={`blog/${props.frontMatter.slug}`}>
                     <MDXRemote {...props.mdxSource} components={{...MDXComponents}} />
+                    <Giscus
+                        id="comments"
+                        repo="yatiyr/giscus-comment"
+                        repoId="R_kgDOI-bJpw"
+                        category="Announcements"
+                        categoryId="DIC_kwDOI-bJp84CUPc-"
+                        mapping="url"
+                        data-strict="0"
+                        term="Welcome to @giscus/react component!"
+                        reactionsEnabled="1"
+                        emitMetadata="0"
+                        inputPosition="top"
+                        theme={`${process.env.PORTFOLIO_API_URL}/media/styles/giscus${giscusColor}.css`}
+                        lang="en"
+                        loading="lazy"
+                        />                    
             </BlogLayout>
         </>
     )
