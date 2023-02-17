@@ -3,22 +3,9 @@ import { Badge, Box, Flex, Heading, Image, useColorModeValue, Text } from "@chak
 
 import NextLink from 'next/link';
 
-interface BlogInfoBoxInterface {
-    slug?                 : any;
-    imageBackgroundColor? : any;
-    imagePath?            : any;
-    linkHoverColor?       : any;
-    headingColor?         : any;
-    title?                : any;
-    paragraphColor?       : any;
-    owner?                : any;
-    date?                 : any;
-    description?          : any;
-}
 
 
-
-const BlogInfoBox = (props : BlogInfoBoxInterface) => {
+const BlogInfoBox = (props : any) => {
 
 
     const cardContainerBg = useColorModeValue("white", "gray.900");
@@ -45,14 +32,14 @@ const BlogInfoBox = (props : BlogInfoBoxInterface) => {
                 my="25px"
                  >
                 <Box marginBottom="10px"
-                    background={props.imageBackgroundColor}
+                    background={"white"}
                     width="100%"
                     display="flex"
                     flexDirection="row"
                     justifyContent="center"
                     transition="background .3s">
                     <Image
-                    objectFit="cover"     
+                    objectFit="contain"     
                     height="200px"
                     width="100%"
                     userSelect="none"
