@@ -1,4 +1,4 @@
-import { Flex, Heading, SimpleGrid, Box, Divider, Text } from "@chakra-ui/react";
+import { Flex, Heading, SimpleGrid, Box, Divider, Text, useColorModeValue } from "@chakra-ui/react";
 import BlogInfoBox from "components/ui/BlogInfoBox";
 import ProjectInfoBox from "components/ui/ProjectInfoBox";
 import {projects} from "data/projects";
@@ -14,6 +14,39 @@ const DistributeSeriesBlogs = (seriesBlogs: any,
                                buttonColor : any,
                                progressColor : any) =>
 {
+
+
+    const hbcGraphics = useColorModeValue("#A200FF4C", "#A200FF4C");
+    const hcGraphics = useColorModeValue("#5C0091FF","#E1ADFFFF");
+    const graphicsBC = useColorModeValue("#63009C99", "#D19FEDE8");
+    const graphicsPC = useColorModeValue("#63009C99", "#D19FEDE8");
+  
+  
+    const hbcGED = useColorModeValue("#00C2FF4C", "#00C2FF4C");
+    const hcGED = useColorModeValue("#005975FF","#85E2FFFF");
+    const GEDBC = useColorModeValue("#006180BF", "#85E2FFE5");
+    const GEDPC = useColorModeValue("#006180BF", "#85E2FFE5");
+  
+    const hbcOD = useColorModeValue("#00FF854C", "#00FF854C");
+    const hcOD = useColorModeValue("#00733CFF","#99FFCEFF");
+    const ODBC = useColorModeValue("#006B38CC", "#39E693FF");
+    const ODPC = useColorModeValue("#006B38CC", "#39E693FF");
+  
+    const hbcCourses = useColorModeValue("#EBFF004C", "#EBFF004C");
+    const hcCourses = useColorModeValue("#444A00FF","#F7FF9EFF");
+    const CoursesBC = useColorModeValue("#6A7300E5", "#F3FF63FF");
+    const CoursesPC = useColorModeValue("#6A7300E5", "#F3FF63FF");
+  
+    const hbcMusic = useColorModeValue("#FFAB5E4C", "#FFAB5E4C");
+    const hcMusic = useColorModeValue("#753800FF","#FFBA7AFF");
+    const MusicBC = useColorModeValue("#87582DFF", "#FFB169FF");
+    const MusicPC = useColorModeValue("#87582DFF", "#FFB169FF");
+  
+    const hbcLife = useColorModeValue("#FF005C4C", "#FF005C4C");
+    const hcLife = useColorModeValue("#6E0027FF","#FFABC9FF");
+    const LifeBC = useColorModeValue("#9E0039FF", "#FF6EA2FF");
+    const LifePC = useColorModeValue("#9E0039FF", "#FF6EA2FF");
+    
     const keys = Object.keys(seriesBlogs);
 
     const resArray = new Array();
@@ -27,13 +60,12 @@ const DistributeSeriesBlogs = (seriesBlogs: any,
 
             if (seriesBlogs[key].length >  1)
             {
-                el = <Flex height="100%" width="100%" flexDirection="column">
+                el = <Flex margin="0px" padding="0px" height="100%" width="100%" flexDirection="column">
                 
-                        <Carousel key={carIndex} gap={0} buttonColor={buttonColor} progressColor={progressColor}>
+                        <Carousel key={carIndex} gap={6} buttonColor={buttonColor} progressColor={progressColor}>
                             {seriesBlogs[key].map((blog : any, index: any) => {
-
                                 return(
-                                    <Flex draggable="false" justifyItems="center" alignItems="center" key={index}>
+                                    <Flex marginLeft="3px" padding="0px" draggable="false" justifyItems="center" alignItems="start" key={index}>
                                         <BlogInfoBox
                                         imagePath={blog.headImageUrl}
                                         title={blog.title}
@@ -53,7 +85,7 @@ const DistributeSeriesBlogs = (seriesBlogs: any,
             }
             else if (seriesBlogs[key].length === 1)
             {
-                el = <Flex draggable="false" height="100%" width="100%" flexDirection="column" key={carIndex}>
+                el = <Flex paddingY="0" marginLeft="0px" draggable="false" height="100%" width="100%" flexDirection="column" key={carIndex}>
                         <BlogInfoBox
                             imagePath={seriesBlogs[key][0].headImageUrl}
                             title={seriesBlogs[key][0].title}
@@ -78,7 +110,7 @@ const DistributeSeriesBlogs = (seriesBlogs: any,
     el = seriesBlogs["no_series"].map((blog: any, index: any) => 
     {
         return(
-            <Flex paddingY="4" marginLeft="10px" draggable="false" height="100%" width="100%" flexDirection="row" key={carIndex}>
+            <Flex paddingY="4" marginLeft="10px" draggable="false" height="100%" width="100%" flexDirection="column" key={carIndex}>
                 <BlogInfoBox
                     imagePath={blog.headImageUrl}
                     title={blog.title}
@@ -121,16 +153,16 @@ const Highlights = (props : any) => {
                 alignSelf="start"
                 textAlign="center" 
                 my={{sm: "0px", lmd: "0px", md: "0px", lg: "0px", xl: "0px", "2xl": "0px"}}
-                fontSize={{sm: "lg", lmd: "xl", md: "2xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
+                fontSize={{sm: "3xl", lmd: "3xl", md: "3xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
                 color={props.headingColor}>Projects</Heading>
             <Text
-             mx={{sm: "100px", lmd: "100px", md: "130px", lg: "160px", xl: "200px", "2xl": "230px"}} 
+             mx={{sm: "25px", lmd: "50px", md: "130px", lg: "160px", xl: "200px", "2xl": "230px"}} 
              alignSelf="start"
-             textAlign="center" 
-             my={{sm: "0px", lmd: "0px", md: "0px", lg: "0px", xl: "0px", "2xl": "0px"}}
+             textAlign="justify" 
+             my={{sm: "75px", lmd: "75px", md: "75px", lg: "75px", xl: "75px", "2xl": "75px"}}
              fontSize={{sm: "lg", lmd: "xl", md: "2xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
              color={props.headingColor}>
-
+            These are my open source projects. Clicking on one of these cards will redirect you to the github page of the project.
             </Text>
             <SimpleGrid my="20px" columns={[1, 1, 2, 3]} spacing="40px">
                 {projects.map((project : any, index : any) => (
@@ -158,8 +190,16 @@ const Highlights = (props : any) => {
                 my={{sm: "0px", lmd: "0px", md: "0px", lg: "0px", xl: "0px", "2xl": "0px"}}
                 fontSize={{sm: "lg", lmd: "xl", md: "2xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
                 color={props.headingColor}>Highlighted Blogs</Heading>
-
-            <SimpleGrid my="15px" columns={[1, null, 2]} spacing="40px">
+            <Text
+             mx={{sm: "25px", lmd: "50px", md: "130px", lg: "160px", xl: "200px", "2xl": "230px"}} 
+             alignSelf="start"
+             textAlign="justify" 
+             my={{sm: "75px", lmd: "75px", md: "75px", lg: "75px", xl: "75px", "2xl": "75px"}}
+             fontSize={{sm: "lg", lmd: "xl", md: "2xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
+             color={props.headingColor}>
+            In this section, highlighted blogs are shown. You can check out Blogs section to see all of the blogs. Blogs that are a part of a series are shown as carousels.
+            </Text>
+            <SimpleGrid my="20px" columns={[1, 1, 2, 3]} spacing="40px">
             {
                 <>
                 {DistributeSeriesBlogs(props.highlightedBlogs, props.headingColor, props.paragraphColor,

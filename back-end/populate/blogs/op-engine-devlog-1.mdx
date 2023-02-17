@@ -1,0 +1,52 @@
+---
+title: 'OP Engine Devlog'
+publishedAt: '2023-02-17'
+summary: 'OP Engine'
+headImageUrl: '/images/OPEngineLogo.png'
+highlighted: 'true'
+postType: 'game/engine dev'
+series: 'op-engine-devlog'
+status: 'published'
+---
+
+## OP Engine Devlog
+
+OP Engine is a game engine that is developed by me. It is in its baby steps. I have been watching @TheCherno's [Game Engine Series](https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT) and learnt a lot about how game engines are built by looking at how he builds his **Hazel Engine**.
+
+<br/>
+
+### Intro
+
+I first started implementing this project in early 2022 while watching him code public branch of **Hazel Engine** and learnt a lot. After finishing the series, I started making a lot of changes according to my needs and OP Engine started forming. It has:
+
+- [x] OpenGL support
+- [x] 3D PBR Graphics 
+- [x] Shadow mapping for multiple lights (cascaded for directional lights)
+- [x] Model loading and skeletal animations 
+- [x] Scene management, entity component system
+- [x] A level editor (OP Editor)
+- [x] 3D Physics with Bullet Physics library
+- [x] C# scripting support with mono
+
+<br/>
+
+### Current State
+
+Here is a demo of the engine:
+
+<br/>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6APM7YaPZdk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+<br/>
+
+In addition, I have implemented boids algorithm using the engine and here is the simulation:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/2I906ALPM4c" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+This engine actually acts as a testbed which helps me learn important concepts especially in graphics programming. As I improve myself, I will add new things and keep track of my progress will devlogs. I wish I started writing devlogs earlier but no worries, I have a lot of things in my mind which needs to be implemented and improved.
+
+I want to implement most of the techniques and algorithms so I learn how the work. In the current state of the engine and level editor, we can build scenes and run simulations, it has performance issues that I am going to address later.
+
+
+

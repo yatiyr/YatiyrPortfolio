@@ -4,7 +4,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const fakeDB = require('./FakeDB');
 
-mongoose.connect(process.env.DB_URI, {
+mongoose.connect("mongodb+srv://test:testtest@cluster0.trrn4.mongodb.net/portfolioDb?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }, async (err) => {

@@ -105,11 +105,10 @@ const WelcomeSection = (props : WelcomeSectionInterface) => {
                             my="0px"
                             fontSize = {{sm: "xl", lmd: "xl", md: "md", lg: "lg", xl: "xl", "2xl": "xl"}}
                             transition="background .3s, color .3s">
-                            I&apos;m Eren. I am a graduate student and a teaching assistant in
-                            Middle East Technical University, Computer Engineering Department, Ankara, Turkey.
-                            I love graphics programming and I&apos;m trying to learn everthing what is necessary
-                            to become a good graphics programmer. Here, I will post my fun projects and also keep track of the things I&apos;m trying to
-                            learn. 
+                            I&apos;m Eren. I am currently a PhD student and a teaching assistant in Middle East Technical University,
+                            Computer Engineering Department, Ankara, Turkey. I love graphics programming and I&apos;m trying to
+                            learn everthing what is necessary to become a good graphics programmer. Here, I will post my fun projects
+                            and also keep track of the things I&apos;m trying to learn. 
                         </Text>
                     <Flex
                         marginTop="20px"

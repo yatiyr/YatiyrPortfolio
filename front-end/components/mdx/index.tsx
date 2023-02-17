@@ -6,6 +6,7 @@ import { Heading, Link as ChakraLink,
 import NextLink from 'next/link';
 import { Image } from "@chakra-ui/image";
 
+import Iframe from 'react-iframe';
 
 const CustomLink = (props : any) => {
 
@@ -146,7 +147,8 @@ TableCaption,
 Thead,
 Tr,
 Th,
-Tfoot     
+Tfoot,
+Iframe   
 };
 
 export default components;

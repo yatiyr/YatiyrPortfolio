@@ -7,6 +7,11 @@
     -webkit-line-clamp: 3 !important;
 }
 
+.video {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+}
+
 .mdx {
   hr {
     margin: 50px 0;

@@ -36,17 +36,18 @@ const WelcomeSection = (props : WelcomeSectionInterface) => {
                     height={{sm: "220px", lmd: "220px", md: "320px", lg: "320px", xl: "320px", "2xl": "320px"}}
                     justifyContent="space-between">
                         <Heading 
-                            my="5px"
+                            my="15px"
                             textAlign="center"
                             color={headingColor}
                             fontFamily="Ubuntu"
-                            fontSize = {{sm: "4xl", lmd: "5xl", md: "5xl", lg: "5xl", xl: "5xl", "2xl": "5xl"}}                            
+                            fontSize = {{sm: "3xl", lmd: "4xl", md: "4xl", lg: "4xl", xl: "5xl", "2xl": "5xl"}} 
                             transition="background .3s, color .3s">
                                 <TypeAnimation
                                     sequence={[
                                         "Welcome",
                                         1000,
-                                        " to my page!"
+                                        "Hoş Geldiniz",
+                                        1500,
                                     ]}
                                     wrapper="div"
                                     cursor={true}
@@ -55,11 +56,11 @@ const WelcomeSection = (props : WelcomeSectionInterface) => {
                             </Heading>
                         <Text 
                             color={paragraphColor}
-                            my="0px"
-                            fontSize = {{sm: "xl", lmd: "xl", md: "4xl", lg: "4xl", xl: "4xl", "2xl": "4xl"}}
+                            my="15px"
+                            fontSize = {{sm: "xl", lmd: "xl", md: "3xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
                             transition="background .3s, color .3s">
-                            Welcome. This site is being built with NextJS and ChakraUI. Blogs and projects are
-                            shown here. For more info, About and Blog pages can be visited.
+                            Welcome. I am Eren. This site is being built with NextJS and ChakraUI. Blogs and projects are
+                            shown here. For more info about me and what I do, About and Blog pages can be visited.
                         </Text>
                 </Flex>
         </Flex>
@@ -82,7 +83,7 @@ const IndexMain = (props : IndexMainInterface) => {
     return(
         <>
             <WelcomeSection/>
-            <Divider marginY="75px" color={linkHoverColor}></Divider>
+            <Divider marginY="85px" color={linkHoverColor}></Divider>
             <Highlights
                 headingColor={headingColor}
                 paragraphColor={paragraphColor}

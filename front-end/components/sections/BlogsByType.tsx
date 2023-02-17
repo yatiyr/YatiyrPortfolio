@@ -75,11 +75,11 @@ const DistributeSeriesBlogs = (seriesBlogsJson: any,
             {
                 el = <Flex height="100%" width="100%" flexDirection="column">
                 
-                        <Carousel key={carIndex} gap={16} buttonColor={buttonColor} progressColor={progressColor}>
+                        <Carousel key={carIndex} gap={6} buttonColor={buttonColor} progressColor={progressColor}>
                             {processedBlogs[key].map((blog : any, index: any) => {
 
                                 return(
-                                    <Flex draggable="false" justifyItems="center" alignItems="center" key={index}>
+                                    <Flex draggable="false" justifyItems="center" alignItems="start" key={index}>
                                         <BlogInfoBox
                                         imagePath={blog.headImageUrl}
                                         title={blog.title}
@@ -99,7 +99,8 @@ const DistributeSeriesBlogs = (seriesBlogsJson: any,
             }
             else if (processedBlogs[key].length === 1)
             {
-                el = <Flex draggable="false" height="100%" width="100%" flexDirection="column" key={carIndex}>
+
+                el = <Flex paddingY="0" marginLeft="0px" draggable="false" height="100%" width="100%" flexDirection="column" key={carIndex}>
                         <BlogInfoBox
                             imagePath={processedBlogs[key][0].headImageUrl}
                             title={processedBlogs[key][0].title}
@@ -125,7 +126,7 @@ const DistributeSeriesBlogs = (seriesBlogsJson: any,
     el = processedBlogs["no_series"].map((blog: any, index: any) => 
     {
         return(
-            <Flex paddingY="4" marginLeft="10px" draggable="false" height="100%" width="100%" flexDirection="row" key={carIndex}>
+            <Flex paddingY="4" marginLeft="10px" draggable="false" height="100%" width="100%" flexDirection="column" key={carIndex}>
                 <BlogInfoBox
                     imagePath={blog.headImageUrl}
                     title={blog.title}
@@ -158,7 +159,6 @@ const BlogsByType = (props: any) =>
     const numberOfSeries = Object.keys(props.blogs).length - 1;
 
     const numberOfNoSeries = props.blogs["no_series"].length;
-
 
     return (
             <Flex
