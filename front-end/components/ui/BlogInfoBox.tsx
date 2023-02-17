@@ -39,7 +39,7 @@ const BlogInfoBox = (props : any) => {
                     justifyContent="center"
                     transition="background .3s">
                     <Image
-                    objectFit="contain"     
+                    objectFit="cover"
                     height="200px"
                     width="100%"
                     userSelect="none"
