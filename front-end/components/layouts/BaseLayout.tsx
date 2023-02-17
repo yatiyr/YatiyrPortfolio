@@ -24,22 +24,6 @@ const BaseLayout = (props : BaseLayoutProps) => {
   const [showHeader, setShowHeader] = useState(true);
 
 
-  const getClientLoc = async () => {
-    /*const res = await axios.get('https://geolocation-db.com/json/');
-
-    const viewData = {
-      ...res.data,
-      page: props.page
-    }
-
-    console.log(res.data);
-    try {
-      await new ViewApi().saveView(viewData);
-    } catch(error) {
-
-    }*/
-  }
-
   const controllHeader = () => {
     if(window.scrollY > 200) {
       setShowHeader(false);
@@ -50,8 +34,6 @@ const BaseLayout = (props : BaseLayoutProps) => {
   }
 
   useEffect(() => {
-
-    getClientLoc();
 
     window.addEventListener('scroll', controllHeader);
     return () => {
