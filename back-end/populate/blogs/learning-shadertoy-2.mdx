@@ -1,0 +1,72 @@
+---
+title: '2D Circle with Shadertoy'
+publishedAt: '2023-02-20'
+summary: 'In this blog, I am trying to learn the very basics. I have created a simple shader that prints a circle in the middle of the screen. This is like "hello world" in shadertoy.'
+headImageUrl: '/images/b1/shadertoy_starter.png'
+highlighted: 'true'
+postType: 'graphics'
+series: 'learning-shadertoy'
+status: 'published'
+---
+
+## New Shader
+
+I logged in and started a new shader. I saw a code on the right side of the screen and
+the output image on the left. In the current version of shadertoy. We get this starter code:
+
+```cpp
+void mainImage( out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+
+    // Time varying pixel color
+    vec3 col = 0.5 + 0.5 * cos(iTime + uv.xyx + vec3(0,2,4));
+
+    // Output to screen
+    fragColor = vec4(col, 1.0);
+}
+```
+The output looks like the following:
+
+<br/>
+<ApiImage alt="starter_output" src="/images/shadertoy/1/shadertoy_starter.png" heigth="100%" width="100%" caption="Output of the starter code"/>
+<br/>
+
+In the image above, in the bar, the things we see from left to write are:
+
+1.  **Reset time button:** This button resets the time.
+2.  **Play/Resume:** We play or stop the time.
+3.  **Fps:** This part shows the fps we get while the shader is running.
+4.  **Resolution:** This part gives the resolution of the framebuffer.
+
+From the code, we can easily derive that the output color is changing according to time. But let's break everything down.
+
+<br/>
+
+First of all, the shader we write has a function called `mainImage`. This function takes two parameters and these are:
+
+-   **out vec4 fragColor**: This is the output and it is the color of the fragment that is currently being processed.
+-   **in vec2 fragCoord**: This is the coordinate of the fragment that is currently being processed.
+
+What I understood from here is that in shadertoy, we are writing a **fragment shader** which is very similar to normal glsl. That means
+shadertoy internally renders a single quad that covers the entire main framebuffer in the vertex shader and passes the texture coordinates of
+the quad and it becomes the **fragCoord** vector. And then we code the **fragment shader** using that.
+
+<br/>
+
+Ok. So in the 4th line, we see `iResolution.xy`. This does not belong to the glsl language, so it looks like a uniform variable that is passed
+to the shader internally. As the name suggests, it is a `vec2` and it represents the resolution of the framebuffer. So, in our case, the resolution
+is 800x450. What is being done in line 4 is normalizing the fragCoords so they vary from 0 to 1. In addition, texture coordinates are just standard webgl
+coordinates(bottom left is (0.0, 0.0) and top right it (1.0, 0.0)).
+
+<br/>
+
+In the 7th line, we calculate the color. We see another uniform that is `iTime`. It is the time we see on the bar of under the output screen. In line 10, we finally set
+the fragColor to the color we calculated.
+
+## Circle
+
+
+
+
