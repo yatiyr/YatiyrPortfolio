@@ -404,7 +404,7 @@ const Item = ({
         _notLast={{
             mr: `${gap}px`
         }}
-        py="4px"
+        py="0px"
         >
         {children}
         </Flex>
