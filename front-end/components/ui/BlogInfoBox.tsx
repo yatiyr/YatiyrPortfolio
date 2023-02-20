@@ -18,7 +18,7 @@ const BlogInfoBox = (props : any) => {
                 as="div" 
                 flexDir="column"
                 width="100%"
-                maxH="500px"
+                height="500px"
                 justifyContent="start"
                 alignItems="center"
                 textOverflow="ellipsis"
