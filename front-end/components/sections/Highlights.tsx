@@ -65,7 +65,7 @@ const DistributeSeriesBlogs = (seriesBlogs: any,
                         <Carousel key={carIndex} gap={6} buttonColor={buttonColor} progressColor={progressColor}>
                             {seriesBlogs[key].map((blog : any, index: any) => {
                                 return(
-                                    <Flex marginLeft="3px" padding="0px" draggable="false" justifyItems="center" alignItems="start" key={index}>
+                                    <Flex marginLeft="0px" padding="0px" draggable="false" justifyItems="center" alignItems="start" key={index}>
                                         <BlogInfoBox
                                         imagePath={blog.headImageUrl}
                                         title={blog.title}

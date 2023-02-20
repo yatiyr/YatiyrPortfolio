@@ -58,7 +58,7 @@ the quad and it becomes the **fragCoord** vector. And then we code the **fragmen
 Ok. So in the 4th line, we see `iResolution.xy`. This does not belong to the glsl language, so it looks like a uniform variable that is passed
 to the shader internally. As the name suggests, it is a `vec2` and it represents the resolution of the framebuffer. So, in our case, the resolution
 is 800x450. What is being done in line 4 is normalizing the fragCoords so they vary from 0 to 1. In addition, texture coordinates are just standard webgl
-coordinates(bottom left is (0.0, 0.0) and top right it (1.0, 0.0)).
+coordinates(bottom left is (0.0, 0.0) and top right is (1.0, 0.0)).
 
 <br/>
 
@@ -67,6 +67,186 @@ the fragColor to the color we calculated.
 
 ## Circle
 
+Now, it is time to write our code. Let's write our own code. This time, we will try to create a circle in the middle of the frame. For that,
+we need an SDF for the circle. We write this code:
+
+```cpp
+void mainImage( out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
 
 
+    float d = length(uv);
+    vec3 col = vec3(d,d,d);
 
+    // Output to screen
+    fragColor = vec4(col,1.0);
+}
+```
+
+In the code above, we have measured the distance of current fragment's
+normalized coordinate and wrote that as R,G and B colors of the output.
+This means that, further we move away from the origin, color converges
+to white. This is the output we get:
+
+<br/>
+<ApiImage alt="circle1_output" src="/images/shadertoy_1_circle.png" heigth="100%" width="100%" caption="Circle field with bottom left origin"/>
+<br/>
+
+We wanted to make the middle of the screen to be the origin but the origin
+is the bottom left corner since it is (0.0, 0.0) in texture coordinates. So,
+we have to convert `uv` such that origin is (0.5,0.5). For that, we modify `uv`
+like the following:
+
+```cpp
+vec2 uv = (fragCoord/iResolution.xy);
+
+uv = uv*2.0 - 1.0;
+...
+```
+
+With this, the bottom left corner becomes (-1.0,-1.0) and the top right corner becomes (1.0,1.0). The final
+shader code looks like this:
+
+```cpp
+void mainImage( out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+    uv = uv*2.0 - 1.0;
+
+    float d = length(uv);
+    vec3 col = vec3(d,d,d);
+
+    // Output to screen
+    fragColor = vec4(col,1.0);
+}
+```
+
+We get the following after the modification:
+
+<br/>
+<ApiImage alt="slightly wrong output" src="/images/shadertoy_1_ellipsoid.png" heigth="100%" width="100%" caption="Ellipsoid instead of a circle."/>
+<br/>
+
+Origin seems right in the middle but something is not right. Circle looks like it is squeezed into the y-axis. This is the
+result of our aspect ratio. Since pixels on the x-axis are larger in number, we get the ellipsoid above when we normalize uv coordinates.
+
+<br/>
+
+To avoid this stretching thing, we have to depend on only one dimension of the resolution. So we modify our code like
+this:
+
+```cpp
+void mainImage( out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+    uv = uv*2.0 - 1.0;
+    uv.x *= iResolution.x /iResolution.y;
+
+    ...
+}
+```
+
+This way, x coordinates are not stretched but they are also not normalized. They can be bigger than 1
+because the width of the framebuffer is greater than the height. This code can be written
+in just one line. For example, Inigo Quilez does this operation like the following:
+
+```cpp
+void mainImage( out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = (2.0 * fragCoord - iResolution.xy)/iResolution.y;
+
+    ...
+}
+```
+
+This effectively does everything we need since the previous code did some redundant operations. Thus,
+our image becomes like this:
+
+<br/>
+<ApiImage alt="correct output" src="/images/shadertoy_1_correctCircleGradient.png" heigth="100%" width="100%" caption="Correct circle gradient"/>
+<br/>
+
+Now, it seems like we have solved the stretching problem. Now, let's draw an actual circle with a radius instead of a circular gradient.
+First, as we learned in our geometry class in high school, the parametric equation of a circle is:
+
+$$
+    (x - a)^2 + (y - b)^2 \leq r^2
+$$
+
+In this equation, $$a$$ and $$b$$ are the x and y coordinates of circle's origin and
+$$r$$ is the radius. By using this knowledge, let's write down a function that draws circles.
+
+
+```cpp
+float drawCircle(in vec2 pCoord, in vec2 pos, in float radius)
+{
+    return step(radius, length(pCoord - pos));
+}
+
+```
+
+We give the function `pCoord`, `pos` and `radius` and respectively;
+
+-   **pCoord** is the coordinate of the current fragment so we are whether this point is in the circle or not.
+-   **pos** is the position of the circle's origin.
+-   **radius** this is simply the radius of the circle
+
+There is also a built-in function `step`. This function takes two parameters and if the second parameter is smaller than
+the first the result becomes 0, otherwise, it becomes 1. So, in our case, `drawCircle` function is going to return
+0.0 if `pCoord` is in the circle and 1.0 otherwise.
+
+For example, if we want to draw a circle with a radius of 1.0 in the middle of the screen, we write this shader.
+
+```cpp
+void mainImage( out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalized pixel coordinates (from 0 to 1)       
+    vec2 uv = (2.0 * fragCoord - iResolution.xy)/iResolution.y;
+
+    float d1 = drawCircle(uv, vec2(0.0,0.0), 1.0);  
+        
+    vec3 col = vec3(d1,d1,d1);
+  
+
+    // Output to screen
+    fragColor = vec4(col,1.0);
+}
+```
+
+Now, we get the circle like this:
+
+<br/>
+<ApiImage alt="circle" src="/images/shadertoy_1_circle_step.png" heigth="100%" width="100%" caption="Correct with step"/>
+<br/>
+
+Finally, we managed to draw our first object in the shader. There is one small thing left to mention. If we look closely
+we see some aliasing on the circumference of the circle. In 2D, we can use `smoothstep` function instead of `step`. This
+function takes 3 parameters, and if the 3rd argument is between 1st and 2nd we get the interpolated result. Interpolation
+is done between 0 and 1. If the 3rd argument is less than the first or bigger than the second, values are clamped between 0 and 1. This way, we can
+get an antialiased circle. We have to modify our `drawCircle` function as follows:
+
+```cpp
+float drawCircle(in vec2 pCoord, in vec2 pos, in float radius)
+{
+    float epsilon = 0.01;
+    return smoothstep(radius, radius + epsilon, length(pCoord - pos));
+}
+```
+
+In this function, we define a small `epsilon` number and if the length is between `radius` and `radius + epsilon`, 
+the result is interpolated between 0 and 1 on the circumference, so we get a smooth transition on the border. The
+final image becomes like this:
+
+<br/>
+<ApiImage alt="circle" src="/images/shadertoy_1_circle_smoothstep.png" heigth="100%" width="100%" caption="Circle with smoothstep"/>
+<br/>
+
+### Closing notes
+
+So, this was the start. Doing all that was actually easy but, I wanted to document it and it took some time. We can draw
+other shapes too using their **SDF** functions but deriving and understanding them is hard for me. I will also make write
+some blog posts under this series about some **SDF** functions that I clearly understood.
