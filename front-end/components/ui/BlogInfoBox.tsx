@@ -60,7 +60,7 @@ const BlogInfoBox = (props : any) => {
                                 _hover={{color: props.linkHoverColor}}                             
                                 color={props.headingColor}
                                 transition="background .3s, color .3s"
-                                fontSize={{sm: "2xl", lmd: "2xl", md: "3xl", lg: "4xl", xl: "4xl", "2xl": "4xl"}}>
+                                fontSize={{sm: "xl", lmd: "xl", md: "2xl", lg: "2xl", xl: "3xl", "2xl": "3xl"}}>
                                     {props.title}
                         </Heading>
                     </Flex>
@@ -74,7 +74,7 @@ const BlogInfoBox = (props : any) => {
                         className="truncated"
                         color={props.paragraphColor}
                         transition="background .3s, color .3s">
-                        <Text>{props.description}</Text>
+                        <Text className="truncated">{props.description}</Text>
                     </Box>
                     <Box as="div"
                         my="10px"
