@@ -346,7 +346,7 @@ there is a shadow on that fragment.
 <br/>
 
 The last thing we need to do is render the sky. For that, I wanted to use the simple method I saw that is used by Inigo Quilez in his live coding session [happy jumping](https://www.youtube.com/watch?v=Cfe5UQ-1L9Q).
-He simply mixes two colors for the sky, one is for normal sky color and the other one is the more greyish horizon color. He gets the mix factor from the y coordinate of the pixel and gives it the value \(e^{-10.0*factor}\).
+He simply mixes two colors for the sky, one is for normal sky color and the other one is the more greyish horizon color. He gets the mix factor (f) from the y coordinate of the pixel and gives it the value \(e^{-10.0*f}\).
 This way, the gray color only appears near the horizon just like we want. Sky looks like the following:
 
 
