@@ -20,7 +20,8 @@ volumetric rendering.
 I have learned how it is implemented by reading the [article of Inigo Quilez](https://iquilezles.org/articles/smin/)
 about smooth min function. In this article, he gives implementations of different smooth min functions and clearly
 explains how they work. He also explains the derivation of **polynomial smooth min 2** function that he gave as
-an example. To learn better, I would like to explain what I understood and document it in this blog post.
+an example. To learn better, I would like to explain what I understood and document it in this blog post. This topic
+has already been explained by lots of programmers but here, my intention is only to document what I have understood.
 
 ## Polynomial Smooth Min
 
@@ -49,5 +50,132 @@ $$
 
 These two functions look like the following:
 
-<iframe src="https://www.desmos.com/calculator/la5sgfpge7?embed" width="375" height="500" style={{border: "1px solid #ccc"}} frameborder="0"></iframe>
 
+<br/>
+<ApiImage alt="smooth_min_1" src="/images/smooth_min_1.png" heigth="100%" width="100%" caption="f(x) and g(x)"/>
+<br/>
+
+In the above figure, we can see what f(x) (purple) and g(x) (green) look like. If we want to take the minimum of these
+two functions, we would get the function below:
+
+<br/>
+<ApiImage alt="smooth_min_2" src="/images/smooth_min_2.png" heigth="100%" width="100%" caption="min(f(x), g(x))"/>
+<br/>
+
+We see that the minimum of these two functions is the red curve. This is the ordinary minimum function. But, if we look
+closely at the intersection point, we see that the transition from left to right is not smooth. According to what I understood,
+this means that the first and second derivatives of the curve right at the left and the right of the intersection point are not
+equal. If we want smoothness, they have to be equal.
+
+<br/>
+
+So, we have to subtract another function from the min(f(x), g(x)) we can name it w(x,k). This function has its peaks at the
+intersection points of both functions and values start decreasing while moving away from the intersection point. In the article, 
+Inigo Quilez says that w is:
+
+$$
+\begin{align}
+    w = h*h*k*\frac{1.0}{4.0}
+\end{align}
+$$
+
+In the equation above, we see that there is another function called **h**. This function is associated with the absolute value
+of the difference between both functions. Moreover, we see **k** which is the smoothness factor. Higher the **k** value, w(x,k)
+increases so intersection points are smoothed even further. **h** function formula is like the following:
+
+$$
+\begin{align}
+    h(x,k) = \frac{\max(k - \abs{f(x) - g(x), 0})}{k}
+\end{align}
+$$
+
+And let's look at **h** visually:
+
+<br/>
+<ApiImage alt="smooth_min_3" src="/images/smooth_min_3.png" heigth="100%" width="100%" caption="h(x,k)"/>
+<br/>
+
+As it is seen, values of **h** are clamped between 0 and 1. As **k** grows, the triangular shape we see here becomes
+wider, so we get a smoother-looking minimum. The two (left and right) edges of this triangular shape determine where
+smoothing starts.
+
+<br/>
+
+And let's now look at the **w(x,k)** function its formula was
+
+$$
+\begin{align}
+    w = h^{n}*k*\frac{1.0}{2.0*n}
+\end{align}
+$$
+
+For n=2, let's look at what smoothed-min looks like:
+
+<br/>
+<ApiImage alt="smooth_min_4" src="/images/smooth_min_4.png" heigth="100%" width="100%" caption="smooth-min"/>
+<br/>
+
+The curve with black dots shows that we have now a smooth min. But why do we have **k/2.0*n** as the denominator?
+This comes from the derivates of the left and right parts of the min function. In the article, Inigo Quilez divides
+**w(x,k)** function to two parts left and right. He calls them **wl(x,k)** and **wr(x,k)**. They are divided because of
+**h(x,k)** function. Because of the absolute value in **h**. For explanation, let's write **wl(x,k)** and **wr(x,k)**
+like the following:
+
+$$
+\begin{align}
+    w_l(x,k) = s*(1 + \frac{f(x) - g(x)}{k}) \\
+    w_r(x,k) = s*(1 - \frac{f(x) - g(x)}{k})
+\end{align}
+$$
+
+So, we have to find **s** here. And we need to check the equation below. To ensure continuity, derivatives
+must be equal to each other when coming from both sides of the intersection point:
+
+$$
+\begin{align}
+    f^\prime(c) - w_{l}^\prime(c,k) = g^\prime(c) - w_{r}^\prime(c,k)
+\end{align}
+$$
+
+Here, **c** point is the intersection point of the two functions. So when **x=c**,
+f(x) - g(x) will always be zero. Let's take the derivatives and look again:
+
+$$
+\begin{align}
+    w_{l}^\prime(c,k) = s*n*(1 + \cancel{\frac{f(c) - g(c)}{k}})^{n-1}*(\frac{f^\prime(c) -  g^\prime(c)}{k})
+    w_{r}^\prime(c,k) = s*n*(1 + \cancel{\frac{-f(c) + g(c)}{k}})^{n-1}*(\frac{-f^\prime(c) +  g^\prime(c)}{k})
+\end{align}
+$$
+
+If we plug those into the equation, we have this:
+
+$$
+\begin{align}
+    \cancel{f^\prime(c) - g^\prime(c)} = \frac{2*s*n*(\cancel{f^\prime(c) - g^\prime(c)})}{k} \\
+    s = \frac{k}{2*n}
+\end{align}
+$$
+
+So, smooth min becomes
+
+$$
+\begin{align}
+    min(f,g) - \frac{k}{2*n}*(max(0, \frac{k - \abs{f-g}}{k}))^n
+\end{align}
+$$
+
+This is how it looks like if we use it on SDFs:
+
+<br/>
+<ApiImage alt="smooth_min_smooth_min" src="/images/smooth_min_smooth_min.png" heigth="100%" width="100%" caption="smooth-min"/>
+<br/>
+
+If we had used the ordinary minimum function instead of smooth min, two objects would look like the following:
+
+<br/>
+<ApiImage alt="smooth_min_normal_min" src="/images/smooth_min_normal_min.png" heigth="100%" width="100%" caption="ordinary minimum function"/>
+<br/>
+
+## Conclusion
+
+So, this is what I understood from smooth minimum function. It looks like a very powerful tool.
