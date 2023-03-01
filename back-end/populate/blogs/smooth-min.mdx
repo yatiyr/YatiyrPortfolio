@@ -15,7 +15,39 @@ While studying SDFs, I have learned that we combine different elements in the sc
 But sometimes, we might want to blend those objects for artistic purposes. I saw that they do it a lot with
 volumetric rendering.
 
+<br/>
 
-## Conclusion
+I have learned how it is implemented by reading the [article of Inigo Quilez](https://iquilezles.org/articles/smin/)
+about smooth min function. In this article, he gives implementations of different smooth min functions and clearly
+explains how they work. He also explains the derivation of **polynomial smooth min 2** function that he gave as
+an example. To learn better, I would like to explain what I understood and document it in this blog post.
 
-The remaining parts of the blog are being written.
+## Polynomial Smooth Min
+
+In the article, the code for the smooth minimum function is the following:
+
+```cpp
+float smin( float a, float b, float k )
+{
+    float h = max( k-abs(a-b), 0.0 )/k;
+    return min( a, b ) - h*h*k*(1.0/4.0);
+}
+```
+
+So, in this code, **a** and **b** are some function values and **k** determines how smooth their minimum will be.
+For example, let's think like this:
+
+- let **a** be **f(x)**
+- let **b** be **g(x)**
+
+$$
+    \begin{align}
+        f(x) = \log_2x \\
+        g(x) = -x + 5
+    \end{align}
+$$
+
+These two functions look like the following:
+
+<iframe src="https://www.desmos.com/calculator/la5sgfpge7?embed" width="100%" height="100%" style="border: 1px solid #ccc" frameborder=0/>
+
