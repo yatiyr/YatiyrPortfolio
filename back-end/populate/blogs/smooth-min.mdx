@@ -42,10 +42,12 @@ For example, let's think like this:
 - let **b** be **g(x)**
 
 $$
+{\scriptsize
 \begin{align}
     f(x) = \log_2x \\
     g(x) = -x + 5
 \end{align}
+}%
 $$
 
 These two functions look like the following:
@@ -74,9 +76,11 @@ intersection points of both functions and values start decreasing while moving a
 Inigo Quilez says that w is:
 
 $$
+{\scriptsize
 \begin{align}
     w = h*h*k*\frac{1.0}{4.0}
 \end{align}
+}%
 $$
 
 In the equation above, we see that there is another function called **h**. This function is associated with the absolute value
@@ -84,9 +88,11 @@ of the difference between both functions. Moreover, we see **k** which is the sm
 increases so intersection points are smoothed even further. **h** function formula is like the following:
 
 $$
+{\scriptsize
 \begin{align}
     h(x,k) = \frac{\max(k - abs(f(x) - g(x), 0))}{k}
 \end{align}
+}%
 $$
 
 And let's look at **h** visually:
@@ -104,9 +110,11 @@ smoothing starts.
 And let's now look at the **w(x,k)** function its formula was
 
 $$
+{\scriptsize
 \begin{align}
     w = h^{n}*k*\frac{1.0}{2.0*n}
 \end{align}
+}%
 $$
 
 For n=2, let's look at what smoothed-min looks like:
@@ -122,19 +130,23 @@ This comes from the derivates of the left and right parts of the min function. I
 like the following:
 
 $$
+{\scriptsize
 \begin{align}
     w_l(x,k) = s*(1 + \frac{f(x) - g(x)}{k}) \\
     w_r(x,k) = s*(1 - \frac{f(x) - g(x)}{k})
 \end{align}
+}%
 $$
 
 So, we have to find **s** here. And we need to check the equation below. To ensure continuity, derivatives
 must be equal to each other when coming from both sides of the intersection point:
 
 $$
+{\scriptsize
 \begin{align}
     f^\prime(c) - w_{l}^\prime(c,k) = g^\prime(c) - w_{r}^\prime(c,k)
 \end{align}
+}%
 $$
 
 Here, **c** point is the intersection point of the two functions. So when **x=c**,
@@ -152,21 +164,25 @@ $$
 If we plug those into the equation, we have this:
 
 $$
+{\scriptsize
 \begin{align}
     \cancel{f^\prime(c) - g^\prime(c)} = \frac{2*s*n*(\cancel{f^\prime(c) - g^\prime(c)})}{k} \\
     s = \frac{k}{2*n}
 \end{align}
+}%
 $$
 
 So, smooth min becomes
 
 $$
+{\scriptsize
 \begin{align}
     min(f,g) - \frac{k}{2*n}*(max(0, \frac{k - abs(f-g)}{k}))^n
 \end{align}
+}%
 $$
 
-This is how it looks like if we use it on SDFs:
+This is what it looks like if we use it on SDFs:
 
 <br/>
 <ApiImage alt="smooth_min_smooth_min" src="/images/smooth_min_smooth_min.png" heigth="100%" width="100%" caption="smooth-min"/>
