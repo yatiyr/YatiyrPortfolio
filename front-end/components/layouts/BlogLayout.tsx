@@ -48,7 +48,13 @@ const BlogLayout = (props : BlogLayoutInterface) => {
         <>
             <Head>
                 <title>{frontMatter.title}</title>
-                <meta name="description" content={frontMatter.title} />
+                <meta property="og:type" content="article" />
+                <meta property="og:title" content={frontMatter.title} />
+                <meta property="og:description" content={frontMatter.summary} />
+                <meta property="og:url" content={`yatiyr.github.io/blog/${frontMatter.slug}`} />
+                <meta property="og:image" content={`${process.env.PORTFOLIO_API_URL}/media/${frontMatter.headImageUrl}`} />
+                <meta property="og:image:width" content="1920" />
+                <meta property="og:image:height" content="1080" />
                 <link
                 rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css"
