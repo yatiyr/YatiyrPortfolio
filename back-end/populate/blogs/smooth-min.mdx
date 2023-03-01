@@ -85,7 +85,7 @@ increases so intersection points are smoothed even further. **h** function formu
 
 $$
 \begin{align}
-    h(x,k) = \frac{\max(k - \abs{f(x) - g(x), 0})}{k}
+    h(x,k) = \frac{\max(k - abs(f(x) - g(x), 0))}{k}
 \end{align}
 $$
 
@@ -160,7 +160,7 @@ So, smooth min becomes
 
 $$
 \begin{align}
-    min(f,g) - \frac{k}{2*n}*(max(0, \frac{k - \abs{f-g}}{k}))^n
+    min(f,g) - \frac{k}{2*n}*(max(0, \frac{k - abs(f-g)}{k}))^n
 \end{align}
 $$
 
