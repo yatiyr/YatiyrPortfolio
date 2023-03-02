@@ -51,7 +51,7 @@ const BlogLayout = (props : BlogLayoutInterface) => {
                 <meta property="og:type" content="article" />
                 <meta property="og:title" content={frontMatter.title} />
                 <meta property="og:description" content={frontMatter.summary} />
-                <meta property="og:url" content={`https://yatiyr-portfolio-yatiyr.vercel.app/blog/${frontMatter.slug}`} />
+                <meta property="og:url" content={`https://yatiyr-portfolio-git-main-yatiyr.vercel.app/blog/${frontMatter.slug}`} />
                 <meta property="og:image" content={`${process.env.PORTFOLIO_API_URL}/media/${frontMatter.headImageUrl}`} />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="627" />
