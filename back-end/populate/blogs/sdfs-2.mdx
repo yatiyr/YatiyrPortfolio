@@ -1,0 +1,65 @@
+---
+title: 'SDFs (Torus Capsule and Cylinder)'
+publishedAt: '2023-03-06'
+summary: 'I was watching tutorials on how to implement simple SDFs. This time, I am explaining how I implemented Torus, Capsule and Cylinder'
+headImageUrl: '/images/sdf_2_mainimage.png'
+highlighted: 'true'
+postType: 'graphics'
+series: 'sdfs'
+status: 'published'
+---
+
+## Introduction
+
+In the previous blog, I explained what I understood on how to implement **Axis-Aligned Plane**, **Sphere** and **Box**.
+This time, I am looking at:
+
+-   Torus
+-   Capsule
+-   Cylinder
+
+### Torus
+
+Torus is relatively simpler than the other two here. We have two radii to work with. One is the radius of the circle which
+is the shape we see when we look at the torus from above. The other radius is the radius of the tube which goes along the circumference
+of the circle that I explained in the previous sentence. The closest point on the surface of a torus to an arbitrary point can be seen
+in this figure:
+
+<br/>
+<ApiImage alt="sdf_torus" src="/images/sdf_torus.png" heigth="100%" width="100%" caption="Closest Distance to a Torus"/>
+<br/>
+
+
+We assume that the torus sits on the **xz** plane where the center is on the origin. We can change orientation and position by manipulating
+the input point we give. So, we have to take the shadow of the point on **xz** plane and calculate the distance to the small circle's center. And then,
+by using the Pythagorean theorem, we can easily calculate length between points **P** and **C2**.
+
+$$
+\begin{align}
+        \lvert PC_2 \rvert = \sqrt{\lvert P_{xz}C_2 \rvert^2  P_y^2} - r_2
+\end{align}
+$$
+
+So this way, we obtain a distance function to a torus object. It looks like this with ray marcing:
+
+<br/>
+<ApiImage alt="sdf_torus" src="/images/sdf_torus_shadertoy.png" heigth="100%" width="100%" caption="Torus object"/>
+<br/>
+
+Its SDF code in shadertoy looks like the following. It does the calculations explained above:
+
+```cpp
+float Torus(vec3 p, vec2 r) {
+	float x = length(p.xz)-r.x;
+    return length(vec2(x, p.y))-r.y;
+}
+```
+
+## Capsule
+
+WORK IN PROGRESS
+
+## Cylinder
+
+WORK IN PROGRESS
+
