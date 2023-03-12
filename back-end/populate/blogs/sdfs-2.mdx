@@ -32,15 +32,15 @@ in this figure:
 
 We assume that the torus sits on the **xz** plane where the center is on the origin. We can change orientation and position by manipulating
 the input point we give. So, we have to take the shadow of the point on **xz** plane and calculate the distance to the small circle's center. And then,
-by using the Pythagorean theorem, we can easily calculate length between points **P** and **C2**.
+by using the Pythagorean theorem, we can easily calculate the length between points **P** and **C2**.
 
 $$
 \begin{align}
-        \lvert PC_2 \rvert = \sqrt{\lvert P_{xz}C_2 \rvert^2  P_y^2} - r_2
+        \lvert PC_2 \rvert = \sqrt{\lvert P_{xz}C_2 \rvert^2 + P_y^2} - r_2
 \end{align}
 $$
 
-So this way, we obtain a distance function to a torus object. It looks like this with ray marcing:
+So this way, we obtain a distance function to a torus object. It looks like this with ray marching:
 
 <br/>
 <ApiImage alt="sdf_torus" src="/images/sdf_torus_shadertoy.png" heigth="100%" width="100%" caption="Torus object"/>
@@ -57,7 +57,71 @@ float Torus(vec3 p, vec2 r) {
 
 ## Capsule
 
-WORK IN PROGRESS
+Finding the distance to a capsule is also straightforward. Let's think about a capsule where the bottom circle's center is **C1** and
+the top circle is **C2**. In the capsule, **C1** is always below **C2**. There are 3 possibilities:
+
+-   Point is above of both **C1** and **C2**
+-   Point is below of both **C1** and **C2**
+-   Point is between **C1** and **C2**
+
+Finding distance for the first two situations is easy. We easily find the distance between the point and the circle center (**C1** or **C2**).
+For the other situation where the point is between **C1** and **C2**, we need to find the point that produces a perpendicular vector
+to the vector **C1 - C2**. For this, we find projection using dot products. The idea is shown below:
+
+<br/>
+<ApiImage alt="sdf_capsule" src="/images/sdf_capsule.png" heigth="100%" width="100%" caption="Closest Distance to a Capsule"/>
+<br/>
+
+So, let's think the point **X** as a movable point between **C1** and **C2**. We first produce a vector from **C1** to **P** and
+take the dot product of this vector and the vector from **C1** to **C2** and divide the whole thing by the multiplication of two vectors'
+lengths. So, we get the **t** value. In the end, we also clamp the resulting **t** value. This gives us a float between **0** and **1**. So:
+
+$$
+\begin{align}
+        t = \frac{C_1P \cdot C_1C_2}{\lvert C_1P \rvert * \lvert C_1C_2 \rvert} \\
+        X = C_1 + t * \frac{C_1C_2}{\lvert C_1C_2 \rvert}
+\end{align}
+$$
+
+From the equations above, we see that if the first situation is the case, t is **1** and X is equal to **C2**, for the second situation, it is **0**  and 
+X is equal to **C1** and for the third one, it is between **0** and **1**. The only thing that is left is to find the distance between X and our Point and
+subtract the **radius** from the result.
+
+$$
+\begin{align}
+        d = \lvert PX \rvert - r
+\end{align}
+$$
+
+For ray marching, it is coded like this:
+
+```cpp
+float Capsule(vec3 p, float r)
+{
+    vec3 c1 = vec3(0.0, -0.5, 0.0);
+    vec3 c2 = vec3(0.0,  0.5, 0.0);
+    
+	vec3 c1c2 = c2-c1;
+    vec3 c1p = p-c1;
+    
+    float t = dot(c1c2, c1p) / dot(c1c2, c1c2);
+    t = clamp(t, 0., 1.);
+    
+    vec3 x = c1 + t*normalize(c1c2);
+    
+    return length(p-x)-r;
+    
+}
+```
+
+In the code above, since the vector **C1C2** is already normalized, we don't even need to normalize it while calculating x. But I'm keeping it
+anyways. The resulting capsule looks like the following:
+
+
+<br/>
+<ApiImage alt="sdf_capsule" src="/images/sdf_capsule_shadertoy.png" heigth="100%" width="100%" caption="Capsule Object"/>
+<br/>
+
 
 ## Cylinder
 
