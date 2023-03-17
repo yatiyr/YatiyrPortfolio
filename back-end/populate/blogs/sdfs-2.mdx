@@ -125,5 +125,75 @@ anyways. The resulting capsule looks like the following:
 
 ## Cylinder
 
-WORK IN PROGRESS
+The logic behind the cylinder's SDF is very similar to the Capsule. We just need to explain where the closest point on the cylinder is the top or bottom
+parts (bases). Just like the capsule we still have three possibilities:
 
+
+-   Point is above of both **C1** and **C2**
+-   Point is below of both **C1** and **C2**
+-   Point is between **C1** and **C2**
+
+The image below explains the situation. If first or second possibilities are the case, we have to somehow find **y**, **x** values and compute the distance using the Pythagorean theorem.
+If the point is directly below the bottom or top of two circle bases of the cylinder, then we don't even need **x** value, only **y** value gives the distance.
+
+<br/>
+<ApiImage alt="sdf_cylinder" src="/images/sdf_Cylinder.png" heigth="100%" width="100%" caption="Closest distance to a Cylinder"/>
+<br/>
+
+The logic is the same with a capsule, but we need to find a way to efficiently compute the **y** value from the values we get. So just like in the cylinder, we have to compute a
+**t** value to get the **x**:
+
+$$
+\begin{align}
+        t = \frac{C_1P \cdot C_1C_2}{\lvert C_1P \rvert * \lvert C_1C_2 \rvert} \\
+        X = C_1 + t * \frac{C_1C_2}{\lvert C_1C_2 \rvert}
+\end{align}
+$$
+
+Now, we can efficiently get the **y** value. We can do it as follows (**c1** is the vec3 point for the bottom base and **c2** is the vec3 point for the top base):
+
+$$
+\begin{align}
+        l = \sqrt{||c_1 - c_2||} \\
+        y = | t - 0.5 | * l
+\end{align}
+$$
+
+This way, we get the SDF of a cylinder. Lastly, we also have to add an interior distance if the point is very close to the surface but inside the cylinder. This trick
+prevent some artifacts of ray marching:
+
+```cpp
+float interiorDistance = min(max(x,y), 0.0);
+```
+
+The full code is the following:
+
+```cpp
+float sdCylinder(vec3 p, float r)
+{
+    vec3 c1 = vec3(0.0, -0.5, 0.0);
+    vec3 c2 = vec3(0.0,  0.5, 0.0);
+    
+    vec3 c1c2 = c2 - c1;
+    vec3 c1p  = p - c1;
+    
+    float t = dot(c1c2, c1p) / dot(c1c2, c1c2);
+
+    vec3 c  = c1 + t*c1c2;
+    
+    float x = length(p-c) - r;
+    float y = (abs(t - 0.5) - 0.5) * length(c1c2);
+    float e = length(max(vec2(x,y), 0.0));
+
+    // Interior Distance
+    float i = min(max(x,y), 0.0);
+    
+    return e+i;    
+}
+```
+
+The resulting cylinder looks like the following in shadertoy:
+
+<br/>
+<ApiImage alt="sdf_cylinder" src="/images/sdf_cylinder_shadertoy.png" heigth="100%" width="100%" caption="Cylinder Object"/>
+<br/>
