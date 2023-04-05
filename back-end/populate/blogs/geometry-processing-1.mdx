@@ -229,7 +229,7 @@ In our lecture slides, curvature is defined like the following:
 
 $$
 \begin{align}
-    K(\nu_i) = 2\pi - \Sigma_{j : \nu_j \in \Nu_{i}(\nu_i)} \theta^{i}_{j}
+    K(\nu_i) = 2\pi - \Sum_{j : \nu_j \in \Nu_{i}(\nu_i)} \theta^{i}_{j}
 \end{align}
 $$
 
@@ -268,21 +268,21 @@ let's experiment on them.
 Let's get 500 samples using Euclidean distances. This is the Average Geodesic Distances colors and the samples.
 
 <br/>
-<ApiImage alt="agd" src="/images/digitalGeometryProcessing_gd1.png" heigth="100%" width="100%" caption="500 Samples Euclidean"/>
+<ApiImage alt="agd" src="/images/digitalGeometryProcessing_agd1.png" heigth="100%" width="100%" caption="500 Samples Euclidean"/>
 <br/>
 
 We see that the samples are taken from reasonable places and the coloring seems ok. The more blue a place is, the more far away from the average of
 all other vertices. What happens if we lower the count of samples, to 50 maybe?
 
 <br/>
-<ApiImage alt="agd2" src="/images/digitalGeometryProcessing_gd2.png" heigth="100%" width="100%" caption="50 Samples Euclidean"/>
+<ApiImage alt="agd2" src="/images/digitalGeometryProcessing_agd2.png" heigth="100%" width="100%" caption="50 Samples Euclidean"/>
 <br/>
 
 It is still pretty much consistent. Now' lets do it with geodesic distances and 20 samples.
 
 
 <br/>
-<ApiImage alt="agd3" src="/images/digitalGeometryProcessing_gd3.png" heigth="100%" width="100%" caption="20 Samples Geodesic"/>
+<ApiImage alt="agd3" src="/images/digitalGeometryProcessing_agd3.png" heigth="100%" width="100%" caption="20 Samples Geodesic"/>
 <br/>
 
 It is still ok. However, with geodesic distances, we lose a lot of computational time. The euclidean is much better for performance
@@ -290,3 +290,93 @@ by losing from accuracy a bit. And the model I'm using is also not very complex.
 objects.
 
 ### Triangle Quality
+
+Now, we have to compute each triangle's quality. Quality is associated with the ratio of circum-radius(radius of the smallest circle around the triangle) and the
+shortest edge of the triangle. The formula for circum radius is:
+
+$$
+\begin{align}
+    r = \frac{|a| \cdot |b|  \cdpt |c|}{4 \cdot A}
+\end{align}
+$$
+
+In this formula, **A** is the area of the triangle and it is computed by taking cross product of two edges , dividing it by 2 and taking its absolute value.
+
+
+$$
+\begin{align}
+    A = \frac{|a| \times |b|}{2}
+\end{align}
+$$
+
+By using this knowledge, we can now do the coding and see the qualities of triangles. The higher the number is, the quality decreases. So, in our case,
+triangles with bad quality will be more blueish and high quality triangles will be reddish. For this, I want to use **cat** model. Let's look at the quality
+of triangles.
+
+<br/>
+<ApiImage alt="tq1" src="/images/digitalGeometryProcessing_tq1.png" heigth="100%" width="100%" caption="Cat Triangle Quality"/>
+<br/>
+
+As we can see above, most of the model's triangles are in good shape. But there must be some bad quality triangles especially in places like
+paws. I want to zoom into the right paw of the cat, because I spotted some bad quality triangles there. If we zoom into the leftmost nail of
+the cat on the right paw, that's what we see:
+
+
+<br/>
+<ApiImage alt="tq2" src="/images/digitalGeometryProcessing_tq2.png" heigth="100%" width="100%" caption="Cat Triangle Quality Paw"/>
+<br/>
+
+So, we see two bad quality triangles here and they are blue.
+
+### Smoothing Operation
+
+The last thing I did for this assignment was the smoothing function. We can trigger this function from the settings window. It moves each vertex
+towards the center vertex of all of the one-ring neighbors. Let's see how, Gaussian Curvature, Average Geodesic Distance and Triangle Qualities change
+when we apply this function like 20 times. For this, I want to use the centaur model.
+
+First these images below are before the smoothing operation:
+
+<br/>
+<ApiImage alt="sm1" src="/images/digitalGeometryProcessing_smooth1.png" heigth="100%" width="100%" caption="Smooth Shading Centaur"/>
+<br/>
+
+<br/>
+<ApiImage alt="sm2" src="/images/digitalGeometryProcessing_smooth2.png" heigth="100%" width="100%" caption="Average Geodesic Distance Centaur"/>
+<br/>
+
+<br/>
+<ApiImage alt="sm3" src="/images/digitalGeometryProcessing_smooth3.png" heigth="100%" width="100%" caption="Gaussian Curvature Centaur"/>
+<br/>
+
+<br/>
+<ApiImage alt="sm4" src="/images/digitalGeometryProcessing_smooth4.png" heigth="100%" width="100%" caption="Triangle Quality Centaur"/>
+<br/>
+
+So this is the original centaur model. Now, I have applied smooth function 20 times. This is the result:
+
+<br/>
+<ApiImage alt="sm5" src="/images/digitalGeometryProcessing_smooth5.png" heigth="100%" width="100%" caption="Smooth Shading Centaur 2"/>
+<br/>
+
+<br/>
+<ApiImage alt="sm6" src="/images/digitalGeometryProcessing_smooth6.png" heigth="100%" width="100%" caption="Average Geodesic Distance Centaur 2"/>
+<br/>
+
+<br/>
+<ApiImage alt="sm7" src="/images/digitalGeometryProcessing_smooth7.png" heigth="100%" width="100%" caption="Gaussian Curvature Centaur 2"/>
+<br/>
+
+<br/>
+<ApiImage alt="sm8" src="/images/digitalGeometryProcessing_smooth8.png" heigth="100%" width="100%" caption="Triangle Quality Centaur 2"/>
+<br/>
+
+The most significant change is for the triangle quality and the shape of the mesh. Mesh started collapsing and we can see the distortion. However,
+it increased the triangle quality overall. Actually, to get perfect triangles all over the mesh, just 2 or 3 smoothing operations were enough. After
+that, in some steps, triangle quailty worsened again but luckily, at the 20th step, I got a perfect triangle result again.
+
+## Conclusion
+
+This was the first assigment for the Digital Geometry Processing Class. I plan to implement other tasks and projects using this application that I've built.
+It is hard to maintain it but this challenge helps me become a better graphics programmer. While first building this application from scratch, I have encountered
+a lot of graphics related problems and could not understand how to solve them. Fortunately, I became more familliar with [RenderDoc](https://renderdoc.org/) and
+solved problems on my shaders. I know that RenderDoc is a widely used GPU profiler in the industry and I need to learn about it more.
