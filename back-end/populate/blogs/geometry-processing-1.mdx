@@ -19,7 +19,8 @@ on the internet such as [TheCherno](https://www.youtube.com/@TheCherno), [Inigo 
 
 Normally, I had to use existing 3D viewers and directly implement the assignment. Thus, the first assignment, I could not finish it in time. But I got a 3D mesh viewer
 that renders a model with different rendering and coloring modes and an orbital camera that is controlled with the mouse. I first want to explain what this mesh editor
-does and how it works.
+does and how it works. I am not going to get into details how I got this editor up and running from scratch because that is not the topic of the journey. However it was
+the hardest part.
 
 ### File Structure of the Executable
 
@@ -68,6 +69,10 @@ it with our mouse. There are different modes of manipulating transform of the me
 
 In the settings window there are different checkboxes, color pickers, combo boxes and input places. They do the following:
 
+<br/>
+<ApiImage alt="settings" src="/images/digitalGeometryProcessing_settings.png" heigth="100%" width="100%" caption="Settings Window"/>
+<br/>
+
 - **Fill:** When it is selected, we can see the whole object in fill mode.
 - **Line:** Object is rendered as lines.
 - **Line Color:** We can change the line color.
@@ -90,5 +95,198 @@ In the settings window there are different checkboxes, color pickers, combo boxe
 - **Smooting Function:** This function smoothes the mesh by moving each vertex towards the center of all one ring neighbors. I saw that using this multiple times increases triangle qualities.
 - **Export Distance Matrix:** When this button is clicked, geodesic distance matrix is exported to the **output** folder with the name of the mesh. It is done asyncronously using future and async.
 
-## Assignment
+## Geodesic Distance Calculation
 
+In the first part of the assignment, we have to select two vertices on the mesh and visualize the shortest geodesic path between them. We also need to report
+the timings for different data structures. We had to do that for **array**, **min heap** and **fibonacci heap**. But I could not implement **fibonacci heap** for
+now. But I know that **fibonacci heap** is more efficient in theory and not so efficient as **min heap** in practice. For demostration, I have loaded **neptune model**
+and explain everything using this model from now on.
+
+<br/>
+
+The image below shows the geodesic distance between points with indices 1 and 105. This can be changed from the settings window and it shows the path right away. In this
+case, the first vertex is the one on below.
+
+
+<br/>
+<ApiImage alt="geodesic1" src="/images/digitalGeometryProcessing_geodesicDistance1.png" heigth="100%" width="100%" caption="Geodesic Distance 1"/>
+<br/>
+
+One thing here to note is that the **line displacement**. This is set as **0.001** but it is just for this model. There are other models where the scale is much
+bigger. So we for these we need bigger line displacements for better visualizations. For example, if we increase line displacement, we get this:
+
+<br/>
+<ApiImage alt="geodesic2" src="/images/digitalGeometryProcessing_geodesicDistance2.png" heigth="100%" width="100%" caption="Wrong Line Displacement"/>
+<br/>
+
+We see that the line is displaced a lot. So we have to choose this factor accordingly.
+
+<br/>
+
+Secondly, we see that when we start playing around with indices, we immediately see the time needed for that geodesic distance calculation. We can also
+select different data structures and compare their values. In my case, **min heap** was significantly faster than **array**. This is understandable because
+**min heap** is a priority queue and it is easier to get minimum values instead of searching min value and erasing from **array**.
+
+<CustomTable variant="simple">
+  <TableCaption>Distance Calculation</TableCaption>
+  <Thead>
+    <Tr>
+      <Th>Data Structure</Th>
+      <Th>Time</Th>
+    </Tr>
+  </Thead>
+  <Tbody>
+    <Tr>
+      <Td>Min Heap</Td>
+      <Td>2.013 ms</Td>
+    </Tr>
+    <Tr>
+      <Td>Bunny</Td>
+      <Td>5.465 ms</Td>
+    </Tr>                                          
+  </Tbody>
+</CustomTable>
+
+Lastly, when we press to **Export Distance Matrix**, we get the NxN Geodesic Distance matrix which shows closest distance from vertices to all other vertices.
+Matrix is saved under **output** folder as I have explained. For bigger meshes, it is harder to calculate so it takes a lot of time and space. For helping, I have implemented this functionality asyncronous. This way our
+rendering is not interrupted.
+
+## Descriptors and Sampling
+
+In this part, we had to compute **Gaussian Curvature** and **Average Geodesic Dsitance** and assign smooth colors. Next, we also had to calculate the quality
+of each triangle and assign colors to them individually.
+
+<br/>
+
+First, In the assignment, it is said that we have interpolate normalized values of descriptors from red, greed to blue. I have learnt that the best way to do
+such an interpolation is using **hsv** color space instead of **rgb** that I currently use. So my first job was searching for conversion functions between **hsv**
+and **rgb**. My plan was firstly compute the interpolated color using **hsv** (we only change the hue) and normalized value and secondly, converting it to the **rgb**
+color. Luckily, I was able to find one. This is the [function by fairlight1337](https://gist.github.com/fairlight1337/4935ae72bcbcc1ba5c72) I found on GitHub. Here is 
+how I used it in my project:
+
+```cpp
+static glm::vec3 Hsv2Rgb(glm::vec3 hsvColor)
+{
+    float fC = hsvColor.z * hsvColor.y;
+    float fHprime = std::fmod(hsvColor.x / 60.0f, 6);
+    float fX = fC * (1 - std::fabs(std::fmod(fHprime, 2) - 1));
+    float fM = hsvColor.z - fC;
+
+    glm::vec3 resultRgb;
+
+    if (0 <= fHprime && fHprime < 1)
+    {
+        resultRgb = glm::vec3(fC, fX, 0.0f);
+    }
+    else if (1 <= fHprime && fHprime < 2)
+    {
+        resultRgb = glm::vec3(fX, fC, 0.0f);
+    }
+    else if (2 <= fHprime && fHprime < 3)
+    {
+        resultRgb = glm::vec3(0.0f, fC, fX);
+    }
+    else if (3 <= fHprime && fHprime < 4)
+    {
+        resultRgb = glm::vec3(0.0f, fX, fC);
+    }
+    else if (4 <= fHprime && fHprime < 5)
+    {
+        resultRgb = glm::vec3(fX, 0.0f, fC);
+    }
+    else if (5 <= fHprime && fHprime < 6)
+    {
+        resultRgb = glm::vec3(fC, 0.0f, fX);
+    }
+    else
+    {
+        resultRgb = glm::vec3(0.0f, 0.0f, 0.0f);
+    }
+
+    resultRgb += glm::vec3(fM, fM, fM);
+    
+    return resultRgb;
+}
+```
+
+And the interpolation is simply this function:
+
+```cpp
+static glm::vec3 GiveGradientColorBetweenRedAndBlue(float t)
+{
+    // A color between red and blue (passes from green in the middle)
+    glm::vec3 hsvColor = glm::vec3(std::min(t, 1.0f) * 228.0f, 1.0, 0.6f);
+
+    return Hsv2Rgb(hsvColor);		
+}
+```
+
+So, after solving this issue, I started implemented **Gaussian Curvature** first.
+
+### Gaussian Curvature
+
+In our lecture slides, curvature is defined like the following:
+
+$$
+\begin{align}
+    K(\nu_i) = 2\pi - \Sigma_{j : \nu_j \in \Nu_{i}(\nu_i)} \theta^{i}_{j}
+\end{align}
+$$
+
+So, according to the formula, we are just adding the angles in a one ring neighborhood and subtracting it from 2*pi. As I understood,
+we get much higher values when there are steeper curves. The image below shows the logic:
+
+<br/>
+<ApiImage alt="gaussiancurvature1" src="/images/digitalGeometryProcessing_gaussiancurvature1.png" heigth="100%" width="100%" caption="Gaussian Curvature"/>
+<br/>
+
+And this is how the coloring looks on model **neptune**:
+
+<br/>
+<ApiImage alt="gaussiancurvature" src="/images/digitalGeometryProcessing_gaussiancurvature.png" heigth="100%" width="100%" caption="Gaussian Curvature: Neptune"/>
+<br/>
+
+### Average Geodesic Distance
+
+Next, we had to implement average geodesic distance for each vertex. Invoking dijkstra's shortest path algorithm everytime is not a good idea. So, we have to take some
+samples on the model. In the assignment, we have used **FPS** sampling which takes samples gradually. In this sampling method, we get the next sample by looking at what we have
+and remembering the closest vertex in the sample, we get the candidate which has the furthest away from the closest vertex in the sample set.
+
+<br/>
+
+For getting distances, there are two options:
+
+- Geodesic distances 
+- Euclidean distances
+
+For simplicity, I am using a simpler model called **man0** from now on. When Geodesic distances are used, we increase compute cost a lot because we have to compute a lot of shortest
+path algorithms. But we do not have this problem with euclidean distances. The problem with euclidead distances is that it does not consider the shape of the mdoel as I understood. So,
+let's experiment on them.
+
+<br/>
+
+Let's get 500 samples using Euclidean distances. This is the Average Geodesic Distances colors and the samples.
+
+<br/>
+<ApiImage alt="agd" src="/images/digitalGeometryProcessing_gd1.png" heigth="100%" width="100%" caption="500 Samples Euclidean"/>
+<br/>
+
+We see that the samples are taken from reasonable places and the coloring seems ok. The more blue a place is, the more far away from the average of
+all other vertices. What happens if we lower the count of samples, to 50 maybe?
+
+<br/>
+<ApiImage alt="agd2" src="/images/digitalGeometryProcessing_gd2.png" heigth="100%" width="100%" caption="50 Samples Euclidean"/>
+<br/>
+
+It is still pretty much consistent. Now' lets do it with geodesic distances and 20 samples.
+
+
+<br/>
+<ApiImage alt="agd3" src="/images/digitalGeometryProcessing_gd3.png" heigth="100%" width="100%" caption="20 Samples Geodesic"/>
+<br/>
+
+It is still ok. However, with geodesic distances, we lose a lot of computational time. The euclidean is much better for performance
+by losing from accuracy a bit. And the model I'm using is also not very complex. Geodesic distance usage might be better for more complex
+objects.
+
+### Triangle Quality
