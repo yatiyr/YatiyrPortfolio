@@ -1,0 +1,94 @@
+---
+title: 'Digital Geometry Processing'
+publishedAt: '2023-04-05'
+summary: 'For the content of digital geometry processing, I took the risk and wanted to implement my own mesh viewer from scratch for the assignments. I will post my journey as blog posts.'
+headImageUrl: '/images/digitalGeometryProcessing_neptune.png'
+highlighted: 'true'
+postType: 'graphics'
+series: 'geometry-processing'
+status: 'published'
+---
+
+## Introduction
+
+Since I'm already implementing [my own game engine](blog/op-engine-devlog-1) and trying to improve as a graphics programmer thanks to brilliant content creators and authors
+on the internet such as [TheCherno](https://www.youtube.com/@TheCherno), [Inigo Quilez](https://iquilezles.org/), [Joey de Vries](https://learnopengl.com/About),
+[Etay Meiri](https://ogldev.org/) and so many others.
+
+<br/>
+
+Normally, I had to use existing 3D viewers and directly implement the assignment. Thus, the first assignment, I could not finish it in time. But I got a 3D mesh viewer
+that renders a model with different rendering and coloring modes and an orbital camera that is controlled with the mouse. I first want to explain what this mesh editor
+does and how it works.
+
+### File Structure of the Executable
+
+This application uses [Assimp](https://github.com/assimp/assimp) as a dynamic library for loading different models. If we consider the folder that the executable resides as the
+root folder. We store the assets in a folder called assets. The structure of assets folder looks like the following.
+
+- **Assets**
+    - **fonts:** Fonts that are used for Imgui are stored here
+    - **models:** All models are stored here, they are all loaded at startup.
+    - **output:** For assignment1, we need to export a **geodesic distance matrix**. This folder holds these matrices.
+    - **shdaders:** All shaders that are used for visualization are kept here.
+        - **include:** Shader includes
+        - **src:** Shader sources
+    - **textures:** For now, It keeps the environment maps.
+
+### Runtime
+
+When we first open the executable, a scene with a whiteish environment map opens. For now, a hard-coded model is directly loaded (I will change it in a couple of days).
+When a model is loaded, these happen:
+
+- Vertices, Normals, TexCoords and Indices are read using Assimp.
+- Triangles are determined for calculating their qualities in the future.
+- Setting up flat vertices and normals. We need this because for coloring individual triangles, we need flat shading. This is the solution I found but there might be better solutions.
+- Setting up the node table that we use for calculating **dijkstra's shortest path between vertices**. We also have another node table for calculating the NxN Geodesic distance matrix. Node tables are unordered maps.
+- Set up the adjacency map, for getting neighbors of vertices. We need this in multiple places.
+- Setting up tangents and bitangents. Honestly, we do not need it for now, because we do not deal with textures. But I calculate them anyways.
+- Calculating colors for assignment. We compute colors for **Gaussian Curvature**, **Average Geodesic Distance** and **Triangle Quality**
+- We set up different vertex array objects for coloring. Instead of filling the same buffer every frame, I decided to keep multiple buffer objects and switch them when the rendering mode changes.
+- Lastly, we set up the main vertex array object.
+
+The image below shows the GUI and the scene when we first open the executable:
+
+<br/>
+<ApiImage alt="firstload" src="/images/digitalGeometryProcessing_firstload.png" heigth="100%" width="100%" caption="Editor at Startup"/>
+<br/>
+
+As is seen here, this application uses [Dear ImGui](https://github.com/ocornut/imgui) as a GUI library. There are two windows, one is the
+viewport and the other is the window for settings. In the viewport, we see a scene with an infinite grid and a weirdly oriented centaur for now.
+The reason is the initial coordinates of the centaur are flipped on their y and z-axis. We also see a gizmo for moving the object. We can use
+it with our mouse. There are different modes of manipulating transform of the mesh:
+
+-- **Hiding Gizmo:** When Q is pressed, the gizmo is hidden.
+-- **Translation:** When W is pressed, the gizmo changes its mode to the translation mode
+-- **Rotation:** When E is pressed, the gizmo changes to the rotation mode
+-- **Scale:** When R is pressed, the gizmo changes to the scaling mode.
+
+In the settings window there are different checkboxes, color pickers, combo boxes and input places. They do the following:
+
+- **Fill:** When it is selected, we can see the whole object in fill mode.
+- **Line:** Object is rendered as lines.
+- **Line Color:** We can change the line color.
+- **Point:** Object is rendered as points.
+- **Point Color:** We can change the point color.
+- **Backface Culling:** Toggles backface culling option.
+- **Calc Method:** This combo box decides which data structure we use for dijkstra's shortest path algorithm.
+- **Render Mode:** This combo box decides the rendering mode when fill is enabled. These modes are:
+    - Average Geodesic Distances
+    - Flat shading
+    - Gaussian Curvature
+    - Triangle Quality
+    - Smooth shading
+- **Calculation Time:** This text area shows the time that is passed while calculating dijkstra's shortest path in milliseconds.
+- **Start and End Indices:** These two fields are used for drawing the shortest line which connects two vertices along the surface of the mesh.
+- **Line Color:** Color of the line determined below.
+- **Line Displacement:** Sometimes, lines might overlap with the surface. This displacement factor transforms the vertices of the line in direction of the surface normal.
+- **Show Line:** Toggles showing lines.
+- **Show samples:** For average geodesic distance calculations, we sample points on the mesh. This is for visualizing these points. Spheres are used for this.
+- **Smooting Function:** This function smoothes the mesh by moving each vertex towards the center of all one ring neighbors. I saw that using this multiple times increases triangle qualities.
+- **Export Distance Matrix:** When this button is clicked, geodesic distance matrix is exported to the **output** folder with the name of the mesh. It is done asyncronously using future and async.
+
+## Assignment
+
