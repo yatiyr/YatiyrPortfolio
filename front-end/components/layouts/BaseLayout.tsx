@@ -1,4 +1,4 @@
-import { Flex, useColorModeValue } from '@chakra-ui/react';
+import { Flex, useColorModeValue, Box } from '@chakra-ui/react';
 import DarkModeSwitch from 'components/ui/DarkModeSwitch';
 import Footer from 'components/sections/Footer';
 import Header from 'components/sections/Header';
@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import ViewApi from 'lib/api/views';
 import Head from 'next/head';
 import axios from 'axios';
-
 interface BaseLayoutProps {
     user : any;
     loading : any;
@@ -62,11 +61,24 @@ const BaseLayout = (props : BaseLayoutProps) => {
           alignItems="stretch"
           backgroundColor={props.backgroundColor}
         >
+          <Flex
+            direction="column"
+            justifySelf="center"
+            alignSelf="center"
+            width={{sm: "100%", lmd: "100%", md: "100%", lg: "80%", xl: "1100px", "2xl": "1300px"}}>
             <Header
-                user={user}
-                loading={loading}/>
-            {children}
-            {/* Buraya footer girecek */}
+              user={user}
+              loading={loading}/>          
+          </Flex>
+          <Flex
+          direction="column"
+            justifySelf="center"
+            alignItems="center"
+            alignSelf="center"
+            width={{sm: "100%", lmd: "100%", md: "100%", lg: "100%", xl: "1200px", "2xl": "1400px"}}>
+              {children}
+              {/* Buraya footer girecek */}
+          </Flex>
             <Footer/>
         </Flex>
     </>
