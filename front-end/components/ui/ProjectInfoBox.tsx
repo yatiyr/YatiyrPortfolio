@@ -5,27 +5,31 @@ import Link from "next/link";
 
 const ProjectInfoBox = (props : any) => {
 
-    const cardContainerBg = useColorModeValue("white", "gray.900");
+    const cardContainerBg = useColorModeValue("purple.50", "purple.900");
     const cardBorder      = useColorModeValue("none", "1px");
     const cardBorderColor = useColorModeValue("gray.900", "gray.800")
-    const githubIconColor = useColorModeValue("gray.900", "gray.50");
+
+
+    const cardHeadingColor = useColorModeValue("gray.900", "gray.100");
+    const cardParagraphColor = useColorModeValue("gray.800", "gray.200");
 
     return (
         <Link href={props.url} passHref>
             <Flex 
                 as="div"
                 flexDir="column"
-                width="100%"
-                height="100%"
+                width="350px"
+                height="275px"
                 justifyContent="start"
                 alignItems="center"
                 textOverflow="ellipsis"
                 backgroundColor={cardContainerBg}
-                boxShadow="0 4px 8px 0 rgba(0,0,0,0.2)"
-                _hover={{boxShadow: "0 12px 24px 0 rgba(0,0,0,0.2)", transform:"translate(0px, -10px)"}}
+                boxShadow="0 4px 8px 0 rgba(0,0,0,0.5)"
+                _hover={{boxShadow: "0 12px 24px 0 rgba(0,0,0,0.7)", transform:"translate(0px, -10px)"}}
                 transition="0.3s"
                 cursor="pointer"
                 border={cardBorder}
+                borderRadius="20px"
                 borderColor={cardBorderColor}>
                 <Flex flexDir="column"
                     width="100%"
@@ -38,16 +42,16 @@ const ProjectInfoBox = (props : any) => {
                         flexWrap="wrap">
                         <Heading
                                 _hover={{color: props.linkHoverColor}}                             
-                                color={props.headingColor}
+                                color={cardHeadingColor}
                                 transition="background .3s, color .3s"
-                                fontSize={{sm: "xl", lmd: "xl", md: "xl", lg: "2xl", xl: "2xl", "2xl": "2xl"}}>
+                                fontSize={{sm: "lg", lmd: "lg", md: "lg", lg: "xl", xl: "xl", "2xl": "xl"}}>
                                     {props.title}
                         </Heading>
                         <Heading
                             _hover={{color: props.linkHoverColor}}                             
-                            color={props.headingColor}
+                            color={cardHeadingColor}
                             transition="background .3s, color .3s"
-                            fontSize={{sm: "xl", lmd: "xl", md: "xl", lg: "2xl", xl: "2xl", "2xl": "2xl"}}>
+                            fontSize={{sm: "lg", lmd: "lg", md: "lg", lg: "xl", xl: "xl", "2xl": "xl"}}>
                                 {props.years}
                         </Heading>
                     </Flex>
@@ -61,7 +65,7 @@ const ProjectInfoBox = (props : any) => {
                     transition="background .3s">
                         <Image
                         objectFit="cover"     
-                        height="200px"
+                        height="100px"
                         width="100%"
                         userSelect="none"
                         src={props.imagePath}
@@ -77,7 +81,8 @@ const ProjectInfoBox = (props : any) => {
                         textOverflow="ellipsis"
                         overflow="hidden"
                         className="truncated"
-                        color={props.paragraphColor}
+                        color={cardParagraphColor}
+                        fontSize={{sm: "xs", lmd: "xs", md: "xs", lg: "xs", xl: "xs", "2xl": "xs"}}
                         transition="background .3s, color .3s">
                         <Text>{props.description}</Text>
                     </Box>
@@ -87,10 +92,10 @@ const ProjectInfoBox = (props : any) => {
                         padding="10px 0px"
                         justifyContent="space-between">
                             <Flex>
-                                <Badge fontWeight="thin" textTransform="none" colorScheme="blue">{props.owner}</Badge>
-                                <Badge fontWeight="thin" textTransform="none" marginLeft="20px" colorScheme="purple">{props.language}</Badge>
+                                <Badge fontWeight="thin" variant="subtle" textTransform="none" colorScheme="blue">{props.owner}</Badge>
+                                <Badge fontWeight="thin" variant="subtle" textTransform="none" marginLeft="20px" colorScheme="purple">{props.language}</Badge>
                             </Flex>
-                            <Icon color={githubIconColor} as={FaGithub}></Icon>
+                            <Icon color={cardParagraphColor} as={FaGithub}></Icon>
                     </Flex>                     
                 </Flex>
             </Flex>

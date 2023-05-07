@@ -143,28 +143,28 @@ const Highlights = (props : any) => {
     return(
         <Flex
         justifyContent="start"
-        alignItems="stretch"
+        alignItems="center"
         flexDirection="column"
-        py={{sm: "10px", lmd: "10px", md: "10px", lg: "40px", xl: "40px", "2xl": "40px"}}
-        px={{sm: "10px", lmd: "20px", md: "20px", lg: "75px", xl: "100px", "2xl": "150px"}}
+        py={{sm: "0px", lmd: "0px", md: "0px", lg: "0px", xl: "0px", "2xl": "0px"}}
+        px={{sm: "10px", lmd: "10px", md: "10px", lg: "35px", xl: "50px", "2xl": "100px"}}
         >         
             <Heading
-                mx={{sm: "100px", lmd: "100px", md: "130px", lg: "160px", xl: "200px", "2xl": "230px"}} 
+                mx={{sm: "50px", lmd: "50px", md: "60px", lg: "80px", xl: "100px", "2xl": "130px"}} 
                 alignSelf="start"
                 textAlign="center" 
                 my={{sm: "0px", lmd: "0px", md: "0px", lg: "0px", xl: "0px", "2xl": "0px"}}
-                fontSize={{sm: "3xl", lmd: "3xl", md: "3xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
+                fontSize={{sm: "xl", lmd: "xl", md: "xl", lg: "xl", xl: "xl", "2xl": "xl"}}
                 color={props.headingColor}>Projects</Heading>
             <Text
-             mx={{sm: "25px", lmd: "50px", md: "130px", lg: "160px", xl: "200px", "2xl": "230px"}} 
+             mx={{sm: "50px", lmd: "50px", md: "60px", lg: "80px", xl: "100px", "2xl": "130px"}} 
              alignSelf="start"
              textAlign="justify" 
-             my={{sm: "75px", lmd: "75px", md: "75px", lg: "75px", xl: "75px", "2xl": "75px"}}
-             fontSize={{sm: "lg", lmd: "xl", md: "2xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
+             my={{sm: "25px", lmd: "25px", md: "25px", lg: "25px", xl: "25px", "2xl": "25px"}}
+             fontSize={{sm: "sm", lmd: "md", md: "md", lg: "lg", xl: "lg", "2xl": "lg"}}
              color={props.headingColor}>
             These are my open source projects. Clicking on one of these cards will redirect you to the github page of the project.
             </Text>
-            <SimpleGrid my="20px" columns={[1, 1, 2, 3]} spacing="40px">
+            <SimpleGrid my="10px" columns={{sm: 1, lmd: 1, md: 2, lg: 2, xl: 2, "2xl": 3}} spacing="40px">
                 {projects.map((project : any, index : any) => (
                     <ProjectInfoBox
                         key={index}
@@ -181,25 +181,25 @@ const Highlights = (props : any) => {
                 ))}
             </SimpleGrid>
 
-            <Divider marginY="75px" marginX="0px" width={"100%"} color={props.linkHoverColor}></Divider> 
+            <Divider marginY="35px" marginX="0px" width={"100%"} color={props.linkHoverColor}></Divider> 
 
             <Heading
-                mx={{sm: "100px", lmd: "100px", md: "130px", lg: "160px", xl: "200px", "2xl": "230px"}} 
+                mx={{sm: "50px", lmd: "50px", md: "60px", lg: "80px", xl: "100px", "2xl": "130px"}} 
                 alignSelf="start"
                 textAlign="center" 
                 my={{sm: "0px", lmd: "0px", md: "0px", lg: "0px", xl: "0px", "2xl": "0px"}}
-                fontSize={{sm: "lg", lmd: "xl", md: "2xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
+                fontSize={{sm: "xl", lmd: "xl", md: "xl", lg: "xl", xl: "xl", "2xl": "xl"}}
                 color={props.headingColor}>Highlighted Blogs</Heading>
             <Text
-             mx={{sm: "25px", lmd: "50px", md: "130px", lg: "160px", xl: "200px", "2xl": "230px"}} 
+             mx={{sm: "50px", lmd: "50px", md: "60px", lg: "80px", xl: "100px", "2xl": "130px"}} 
              alignSelf="start"
              textAlign="justify" 
-             my={{sm: "75px", lmd: "75px", md: "75px", lg: "75px", xl: "75px", "2xl": "75px"}}
-             fontSize={{sm: "lg", lmd: "xl", md: "2xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
+             my={{sm: "25px", lmd: "25px", md: "25px", lg: "25px", xl: "25px", "2xl": "25px"}}
+             fontSize={{sm: "sm", lmd: "md", md: "md", lg: "lg", xl: "lg", "2xl": "lg"}}
              color={props.headingColor}>
             In this section, highlighted blogs are shown. You can check out Blogs section to see all of the blogs. Blogs that are a part of a series are shown as carousels.
             </Text>
-            <SimpleGrid my="20px" columns={[1, 1, 2, 3]} spacing="40px">
+            <SimpleGrid my="10px" columns={{sm: 1, lmd: 1, md: 1, lg: 1, xl: 1, "2xl": 1}} spacing="30px">
             {
                 <>
                 {DistributeSeriesBlogs(props.highlightedBlogs, props.headingColor, props.paragraphColor,

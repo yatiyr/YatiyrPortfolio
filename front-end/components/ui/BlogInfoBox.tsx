@@ -16,9 +16,10 @@ const BlogInfoBox = (props : any) => {
         <NextLink href={`blog/${props.slug}`} is="div" draggable="false" passHref>
             <Flex
                 as="div" 
+                alignSelf="center"
+                justifySelf="center"
                 flexDir="column"
                 width="100%"
-                height="466px"
                 justifyContent="start"
                 alignItems="center"
                 textOverflow="ellipsis"
@@ -30,7 +31,7 @@ const BlogInfoBox = (props : any) => {
                 transition="0.3s"
                 cursor="pointer"
                 border={cardBorder}        
-                my="25px"
+                my="20px"
                  >
                 <Box marginBottom="10px"
                     background={"white"}
@@ -41,8 +42,8 @@ const BlogInfoBox = (props : any) => {
                     transition="background .3s">
                     <Image
                     objectFit="cover"
-                    height="200px"
-                    width="100%"
+                    height={{sm: "400px", lmd: "400px", md: "400px", lg: "400px", xl: "400px", "2xl": "500px"}}
+                    width="1500px"
                     userSelect="none"
                     draggable="false"
                     src={`${process.env.PORTFOLIO_API_URL}/media/${props.imagePath}`}
@@ -52,7 +53,7 @@ const BlogInfoBox = (props : any) => {
                 <Flex flexDir="column"
                     width="100%"
                     height="100%"
-                    padding="4px 16px">
+                    padding="10px 8px">
                     <Flex flexDir="row"
                         width="100%"
                         justifyContent="start">
@@ -60,6 +61,7 @@ const BlogInfoBox = (props : any) => {
                                 _hover={{color: props.linkHoverColor}}                             
                                 color={props.headingColor}
                                 transition="background .3s, color .3s"
+                                py="20px"
                                 fontSize={{sm: "xl", lmd: "xl", md: "2xl", lg: "2xl", xl: "3xl", "2xl": "3xl"}}>
                                     {props.title}
                         </Heading>

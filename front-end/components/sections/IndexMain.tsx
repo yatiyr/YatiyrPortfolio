@@ -24,23 +24,23 @@ const WelcomeSection = (props : WelcomeSectionInterface) => {
     return(
         <Flex
             flexDirection={{sm: "column", lmd: "column", md: "row", lg: "row", xl: "row", "2xl": "row"}}
-            minHeight={{sm: "250px", lmd: "280px", md: "400px", lg: "400px", xl: "400px", "2xl": "400px"}}
+            minHeight={{sm: "50px", lmd: "80px", md: "100px", lg: "100px", xl: "100px", "2xl": "100px"}}
             zIndex="1"
             justifyContent={{sm: "start", lmd: "start", md: "start", lg: "center", xl: "center", "2xl": "center"}}
             alignItems={{sm: "center", lmd: "center", md: "start", lg: "center", xl: "center", "2xl": "center"}}            
-            my={{sm: "10px", lmd: "20px", md: "20px", lg: "20px", xl: "20px", "2xl": "10px"}}
+            my={{sm: "20px", lmd: "20px", md: "20px", lg: "20px", xl: "20px", "2xl": "20px"}}
             mx={{sm: "0", lmd: "0", md: "20px", lg: "75px", xl: "100px", "2xl": "150px"}}>
                 <Flex
                     flexDirection="column"
-                    margin="10px 50px 0px 50px"
-                    height={{sm: "220px", lmd: "220px", md: "320px", lg: "320px", xl: "320px", "2xl": "320px"}}
+                    margin="10px 60px 0px 60px"
+                    height={{sm: "180px", lmd: "180px", md: "180px", lg: "180px", xl: "180px", "2xl": "180px"}}
                     justifyContent="space-between">
                         <Heading 
-                            my="15px"
+                            my="10px"
                             textAlign="center"
                             color={headingColor}
                             fontFamily="Ubuntu"
-                            fontSize = {{sm: "3xl", lmd: "4xl", md: "4xl", lg: "4xl", xl: "5xl", "2xl": "5xl"}} 
+                            fontSize = {{sm: "2xl", lmd: "3xl", md: "3xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}} 
                             transition="background .3s, color .3s">
                                 <TypeAnimation
                                     sequence={[
@@ -56,8 +56,9 @@ const WelcomeSection = (props : WelcomeSectionInterface) => {
                             </Heading>
                         <Text 
                             color={paragraphColor}
-                            my="15px"
-                            fontSize = {{sm: "xl", lmd: "xl", md: "3xl", lg: "3xl", xl: "3xl", "2xl": "3xl"}}
+                            mx= {{sm: "10px", lmd: "15px", md: "25px", lg: "25px", xl: "50px", "2xl": "75px"}} 
+                            my="0px"
+                            fontSize = {{sm: "md", lmd: "md", md: "md", lg: "lg", xl: "lg", "2xl": "lg"}}
                             transition="background .3s, color .3s">
                             Welcome. I am Eren. This site is being built with NextJS and ChakraUI. Blogs and projects are
                             shown here. For more info about me and what I do, About and Blog pages can be visited.
@@ -83,7 +84,7 @@ const IndexMain = (props : IndexMainInterface) => {
     return(
         <>
             <WelcomeSection/>
-            <Divider marginY="85px" color={linkHoverColor}></Divider>
+            <Divider marginY="20px" color={linkHoverColor}></Divider>
             <Highlights
                 headingColor={headingColor}
                 paragraphColor={paragraphColor}
