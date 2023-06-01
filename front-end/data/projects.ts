@@ -2,7 +2,7 @@ export const projects = [
     {
         owner: "yatiyr",        
         title: "OP Engine",
-        url: "https://github.com/yatiyr/yatiyr-portfolio",
+        url: "https://github.com/yatiyr/OP-Engine",
         imagePath: "./images/OP_Engine_RoughnessMetalness.PNG",
         years: "2022",
         description: "A Game Engine written in C++. It supports PBR rendering, C# scripting and can handle 3D Physics. It also has a level editor called OP Editor.",
